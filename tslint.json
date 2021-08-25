@@ -19,6 +19,9 @@
     ],
     "no-parameter-reassignment":[
       false
+    ],
+    "align": [
+      false
     ]
   },
   "rulesDirectory": []
