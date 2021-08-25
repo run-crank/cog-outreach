@@ -14,7 +14,7 @@ executors:
 jobs:
   test:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:10
     steps:
       - checkout
       - restore_cache:
