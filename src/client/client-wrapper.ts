@@ -27,6 +27,7 @@ class ClientWrapper {
   constructor(auth: grpc.Metadata, clientConstructor = axios) {
     this.client = clientConstructor.default;
     const delaySeconds = 10;
+
     this.clientReady = new Promise((resolve, reject) => {
       // Add a delay before requesting a new token since
       // Outreach only allows token generations supposedly every 60 seconds
