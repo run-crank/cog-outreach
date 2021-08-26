@@ -2,12 +2,12 @@ version: 2.1
 executors:
   docker-publisher:
     environment:
-      IMAGE_NAME: automatoninc/_outreach
+      IMAGE_NAME: automatoninc/outreach
     docker:
       - image: circleci/buildpack-deps:stretch
   docker-user:
     environment:
-      IMAGE_NAME: automatoninc/_outreach
+      IMAGE_NAME: automatoninc/outreach
     machine:
       image: circleci/classic:latest
 
