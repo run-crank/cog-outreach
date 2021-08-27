@@ -58,6 +58,28 @@ export class ProspectAwareMixin {
     });
   }
 
+  public async updateProspect(id: string, prospect: Record<string, any>): Promise<Record<string, any>> {
+    await this.clientReady;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await this.client.post(`/prospects/${id}`, {
+          data: {
+            type: 'prospect',
+            id,
+            attributes: prospect,
+          },
+        });
+        resolve(response.data);
+      } catch (e) {
+        if (e.response.data) {
+          reject(e.response.data.errors.map(error => error.detail).join(', '));
+        } else {
+          reject(e);
+        }
+      }
+    });
+  }
+
   public async deleteProspectById(id: string): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {

@@ -58,6 +58,28 @@ export class AccountAwareMixin {
     });
   }
 
+  public async updateAccount(id: string, account: Record<string, any>): Promise<Record<string, any>> {
+    await this.clientReady;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await this.client.post(`/accounts/${id}`, {
+          data: {
+            type: 'account',
+            id,
+            attributes: account,
+          },
+        });
+        resolve(response.data);
+      } catch (e) {
+        if (e.response.data) {
+          reject(e.response.data.errors.map(error => error.detail).join(', '));
+        } else {
+          reject(e);
+        }
+      }
+    });
+  }
+
   public async deleteAccountById(id: string): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
