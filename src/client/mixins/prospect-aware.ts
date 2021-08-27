@@ -1,15 +1,15 @@
 
 import * as axios from 'axios';
 
-export class AccountAwareMixin {
+export class ProspectAwareMixin {
   client: axios.AxiosInstance;
   public clientReady: Promise<boolean>;
 
-  public async getAllAccount(): Promise<Record<string, any>> {
+  public async getAllProspect(): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.get('/accounts');
+        const response = await this.client.get('/prospects');
         resolve(response.data);
       } catch (e) {
         if (e.response.data) {
@@ -21,11 +21,11 @@ export class AccountAwareMixin {
     });
   }
 
-  public async getAccountById(id: string): Promise<Record<string, any>> {
+  public async getProspectById(id: string): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.get(`/accounts/${id}`);
+        const response = await this.client.get(`/prospects/${id}`);
         resolve(response.data);
       } catch (e) {
         if (e.response.data) {
@@ -37,14 +37,14 @@ export class AccountAwareMixin {
     });
   }
 
-  public async createAccount(account: Record<string, any>): Promise<Record<string, any>> {
+  public async createProspect(prospect: Record<string, any>): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.post('/accounts', {
+        const response = await this.client.post('/prospects', {
           data: {
-            type: 'account',
-            attributes: account,
+            type: 'prospect',
+            attributes: prospect,
           },
         });
         resolve(response.data);
@@ -58,11 +58,11 @@ export class AccountAwareMixin {
     });
   }
 
-  public async deleteAccountById(id: string): Promise<Record<string, any>> {
+  public async deleteProspectById(id: string): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.delete(`/accounts/${id}`);
+        const response = await this.client.delete(`/prospects/${id}`);
         resolve(response.data);
       } catch (e) {
         if (e.response.data) {
