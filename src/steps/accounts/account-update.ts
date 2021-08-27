@@ -7,6 +7,10 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
   protected stepExpression: string = 'create a outreach account';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
+    field: 'id',
+    type: FieldDefinition.Type.STRING,
+    description: "Account's Id",
+  }, {
     field: 'account',
     type: FieldDefinition.Type.MAP,
     description: 'A map of field names to field values',
