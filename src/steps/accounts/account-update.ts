@@ -25,9 +25,10 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     const account: any = stepData.account;
+    const id: any = stepData.id;
 
     try {
-      const result = await this.client.createAccount(account);
+      const result = await this.client.updateAccount(id, account);
       const record = this.keyValue('account', 'Created Account', { Id: result.data.id });
       return this.pass('Successfully created Account with ID %s', [result.data.id], [record]);
     } catch (e) {

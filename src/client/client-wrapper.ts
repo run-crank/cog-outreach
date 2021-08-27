@@ -2,6 +2,8 @@ import * as grpc from 'grpc';
 import * as axios from 'axios';
 import { Field } from '../core/base-step';
 import { AccountAwareMixin } from './mixins';
+import { FieldDefinition } from '../proto/cog_pb';
+import { ProspectAwareMixin } from './mixins/prospect-aware';
 
 /**
  * This is a wrapper class around the API client for your Cog. An instance of
@@ -18,9 +20,24 @@ class ClientWrapper {
    *
    * If your Cog does not require authentication, set this to an empty array.
    */
-  public static expectedAuthFields: Field[] = [];
+  public static expectedAuthFields: Field[] = [{
+    field: 'clientId',
+    type: FieldDefinition.Type.STRING,
+    description: 'OAuth2 Client ID',
+  }, {
+    field: 'clientSecret',
+    type: FieldDefinition.Type.STRING,
+    description: 'OAuth2 Client Secret',
+  }, {
+    field: 'redirectUrl',
+    type: FieldDefinition.Type.STRING,
+    description: 'Redirect Url',
+  }, {
+    field: 'refreshToken',
+    type: FieldDefinition.Type.STRING,
+    description: 'Refresh Token',
+  }];
   public client: axios.AxiosInstance;
-  public retry: any;
   public clientReady: Promise<boolean>;
   public authUrl = 'https://api.outreach.io/oauth/token';
 
@@ -44,11 +61,13 @@ class ClientWrapper {
             this.client = axios.default.create({
               baseURL: 'https://api.outreach.io/api/v2',
               headers: {
-                Authorization: res.access_token,
+                Authorization: `Bearer ${res.data.access_token}`,
               },
             });
             resolve(true);
           });
+        } else {
+          reject('Unauthorized access');
         }
       }, delaySeconds * 1000);
     });
@@ -56,8 +75,8 @@ class ClientWrapper {
 
 }
 
-interface ClientWrapper extends AccountAwareMixin { }
-applyMixins(ClientWrapper, [AccountAwareMixin]);
+interface ClientWrapper extends AccountAwareMixin, ProspectAwareMixin { }
+applyMixins(ClientWrapper, [AccountAwareMixin, ProspectAwareMixin]);
 
 function applyMixins(derivedCtor: any, baseCtors: any[]) {
   baseCtors.forEach((baseCtor) => {

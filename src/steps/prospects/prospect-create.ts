@@ -1,40 +1,40 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
 import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
 
-export class AccountCreateStep extends BaseStep implements StepInterface {
+export class ProspectCreateStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Create a Outreach Account';
-  protected stepExpression: string = 'create a outreach account';
+  protected stepName: string = 'Create a Outreach Prospect';
+  protected stepExpression: string = 'create a outreach prospect';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
-    field: 'account',
+    field: 'prospect',
     type: FieldDefinition.Type.MAP,
     description: 'A map of field names to field values',
   }];
   protected expectedRecords: ExpectedRecord[] = [{
-    id: 'account',
+    id: 'prospect',
     type: RecordDefinition.Type.KEYVALUE,
     fields: [{
       field: 'Id',
       type: FieldDefinition.Type.STRING,
-      description: "Account's Outreach ID",
+      description: "Prospect's Outreach ID",
     }],
     dynamicFields: false,
   }];
 
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
-    const account: any = stepData.account;
+    const prospect: any = stepData.prospect;
 
     try {
-      const result = await this.client.createAccount(account);
-      const record = this.keyValue('account', 'Created Account', { Id: result.data.id });
-      return this.pass('Successfully created Account with ID %s', [result.data.id], [record]);
+      const result = await this.client.createProspect(prospect);
+      const record = this.keyValue('prospect', 'Created Prospect', { Id: result.data.id });
+      return this.pass('Successfully created Prospect with ID %s', [result.data.id], [record]);
     } catch (e) {
-      return this.error('There was a problem creating the Account: %s', [e.toString()]);
+      return this.error('There was a problem creating the Prospect: %s', [e.toString()]);
     }
   }
 
 }
 
-export { AccountCreateStep as Step };
+export { ProspectCreateStep as Step };

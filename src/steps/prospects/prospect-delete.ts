@@ -1,23 +1,23 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
 import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
 
-export class AccountDeleteStep extends BaseStep implements StepInterface {
+export class ProspectDeleteStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Delete a Outreach Account';
-  protected stepExpression: string = 'delete the outreach account with (?<field>[a-zA-Z0-9_]+) (?<identifier>.+)';
+  protected stepName: string = 'Delete a Outreach Prospect';
+  protected stepExpression: string = 'delete the outreach prospect with (?<field>[a-zA-Z0-9_]+) (?<identifier>.+)';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
     field: 'id',
     type: FieldDefinition.Type.STRING,
-    description: "Account's Id",
+    description: "Prospect's Id",
   }];
   protected expectedRecords: ExpectedRecord[] = [{
-    id: 'account',
+    id: 'prospect',
     type: RecordDefinition.Type.KEYVALUE,
     fields: [{
       field: 'Id',
       type: FieldDefinition.Type.STRING,
-      description: "Account's Outreach ID",
+      description: "Prospect's Outreach ID",
     }],
     dynamicFields: false,
   }];
@@ -26,14 +26,14 @@ export class AccountDeleteStep extends BaseStep implements StepInterface {
     const stepData: any = step.getData().toJavaScript();
 
     try {
-      await this.client.deleteAccountById(stepData.id);
-      const record = this.keyValue('account', 'Deleted Account', { Id: stepData.id });
-      return this.pass('Successfully deleted Account with Id %s', [stepData.id], [record]);
+      await this.client.deleteProspectById(stepData.id);
+      const record = this.keyValue('prospect', 'Deleted Prospect', { Id: stepData.id });
+      return this.pass('Successfully deleted Prospect with Id %s', [stepData.id], [record]);
     } catch (e) {
-      return this.error('There was a problem deleting the Account: %s', [e.toString()]);
+      return this.error('There was a problem deleting the Prospect: %s', [e.toString()]);
     }
   }
 
 }
 
-export { AccountDeleteStep as Step };
+export { ProspectDeleteStep as Step };
