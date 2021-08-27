@@ -64,8 +64,8 @@ export class ProspectAwareMixin {
       try {
         const response = await this.client.post(`/prospects/${id}`, {
           data: {
-            type: 'prospect',
             id,
+            type: 'prospect',
             attributes: prospect,
           },
         });

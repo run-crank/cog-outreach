@@ -64,8 +64,8 @@ export class AccountAwareMixin {
       try {
         const response = await this.client.post(`/accounts/${id}`, {
           data: {
-            type: 'account',
             id,
+            type: 'account',
             attributes: account,
           },
         });
