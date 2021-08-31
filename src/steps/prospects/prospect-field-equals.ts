@@ -5,7 +5,7 @@ import { Step, FieldDefinition, StepDefinition, RecordDefinition, StepRecord } f
 import * as util from '@run-crank/utilities';
 import { baseOperators } from '../../client/constants/operators';
 
-export class ProspectFieldEquals extends BaseStep implements StepInterface {
+export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
 
   protected stepName: string = 'Check a field on a Outreach prospect';
   // tslint:disable-next-line:max-line-length
@@ -92,4 +92,4 @@ export class ProspectFieldEquals extends BaseStep implements StepInterface {
   }
 }
 
-export { ProspectFieldEquals as Step };
+export { ProspectFieldEqualsStep as Step };
