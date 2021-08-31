@@ -1,10 +1,10 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
 import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
 
-export class AccountCreateStep extends BaseStep implements StepInterface {
+export class AccountUpdateStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Create a Outreach Account';
-  protected stepExpression: string = 'create a outreach account';
+  protected stepName: string = 'Update an Outreach Account';
+  protected stepExpression: string = 'update an outreach account';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
     field: 'id',
@@ -42,4 +42,4 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
 
 }
 
-export { AccountCreateStep as Step };
+export { AccountUpdateStep as Step };
