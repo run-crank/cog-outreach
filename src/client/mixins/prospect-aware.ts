@@ -62,7 +62,7 @@ export class ProspectAwareMixin {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.post(`/prospects/${id}`, {
+        const response = await this.client.patch(`/prospects/${id}`, {
           data: {
             id,
             type: 'prospect',
