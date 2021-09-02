@@ -64,8 +64,8 @@ export class AccountAwareMixin {
       try {
         const response = await this.client.patch(`/accounts/${id}`, {
           data: {
-            id,
             type: 'account',
+            id: +id,
             attributes: account,
           },
         });

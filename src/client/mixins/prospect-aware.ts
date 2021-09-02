@@ -64,8 +64,8 @@ export class ProspectAwareMixin {
       try {
         const response = await this.client.patch(`/prospects/${id}`, {
           data: {
-            id,
             type: 'prospect',
+            id: +id,
             attributes: prospect,
           },
         });

@@ -3,8 +3,8 @@ import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinitio
 
 export class ProspectUpdateStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Update a Outreach Prospect';
-  protected stepExpression: string = 'update a outreach prospect';
+  protected stepName: string = 'Update an Outreach Prospect';
+  protected stepExpression: string = 'update an outreach prospect';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
     field: 'id',
@@ -29,13 +29,14 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     const prospect: any = stepData.prospect;
+    const id: any = stepData.id;
 
     try {
-      const result = await this.client.createProspect(prospect);
-      const record = this.keyValue('prospect', 'Created Prospect', { Id: result.data.id });
-      return this.pass('Successfully created Prospect with ID %s', [result.data.id], [record]);
+      const result = await this.client.updateProspect(id, prospect);
+      const record = this.keyValue('prospect', 'Updated Prospect', { Id: result.data.id });
+      return this.pass('Successfully updated Prospect with ID %s', [result.data.id], [record]);
     } catch (e) {
-      return this.error('There was a problem creating the Prospect: %s', [e.toString()]);
+      return this.error('There was a problem updated the Prospect: %s', [e.toString()]);
     }
   }
 
