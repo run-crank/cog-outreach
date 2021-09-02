@@ -3,8 +3,8 @@ import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinitio
 
 export class AccountCreateStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Create a Outreach Account';
-  protected stepExpression: string = 'create a outreach account';
+  protected stepName: string = 'Create an Outreach Account';
+  protected stepExpression: string = 'create an outreach account';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
     field: 'account',
