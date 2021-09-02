@@ -62,7 +62,7 @@ export class AccountAwareMixin {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.post(`/accounts/${id}`, {
+        const response = await this.client.patch(`/accounts/${id}`, {
           data: {
             id,
             type: 'account',
