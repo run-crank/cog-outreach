@@ -1,5 +1,6 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
 import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
+import * as moment from 'moment';
 
 export class ProspectCreateStep extends BaseStep implements StepInterface {
 
@@ -22,17 +23,41 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
     dynamicFields: false,
   }];
 
+  private dateFields = [
+    'graduationDate',
+    'jobStartDate',
+  ];
+  private dateTimeFields = [
+    'trashedAt',
+    'dateOfBirth',
+    'availableAt',
+  ];
+
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
-    const prospect: any = stepData.prospect;
+    let prospect: any = stepData.prospect;
 
     try {
+      prospect = this.validateObject(prospect);
       const result = await this.client.createProspect(prospect);
       const record = this.keyValue('prospect', 'Created Prospect', { Id: result.data.id });
       return this.pass('Successfully created Prospect with ID %s', [result.data.id], [record]);
     } catch (e) {
       return this.error('There was a problem creating the Prospect: %s', [e.toString()]);
     }
+  }
+
+  validateObject(account): any {
+    Object.keys(account).forEach((key) => {
+      if (this.dateTimeFields.includes(key) || this.dateFields.includes(key)) {
+        account[key] = this.formatDate(account[key]);
+      }
+    });
+    return account;
+  }
+
+  formatDate(date: string): string {
+    return moment(date).format('YYYY-MM-DD');
   }
 
 }
