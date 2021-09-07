@@ -29,7 +29,7 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
 
   private dateTimeFields = [
     'foundedAt',
-  ]
+  ];
 
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
@@ -47,7 +47,7 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
   }
 
   validateObject(account): any {
-    Object.keys(account).forEach(key => {
+    Object.keys(account).forEach((key) => {
       if (this.dateTimeFields.includes(key)) {
         account[key] = this.formatDate(account[key]);
       }

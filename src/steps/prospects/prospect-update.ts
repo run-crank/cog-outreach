@@ -30,12 +30,12 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
   private dateFields = [
     'graduationDate',
     'jobStartDate',
-  ]
+  ];
   private dateTimeFields = [
     'trashedAt',
     'dateOfBirth',
     'availableAt',
-  ]
+  ];
 
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
@@ -53,7 +53,7 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
   }
 
   validateObject(account): any {
-    Object.keys(account).forEach(key => {
+    Object.keys(account).forEach((key) => {
       if (this.dateTimeFields.includes(key) || this.dateFields.includes(key)) {
         account[key] = this.formatDate(account[key]);
       }
