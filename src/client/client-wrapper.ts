@@ -43,7 +43,6 @@ class ClientWrapper {
 
   constructor(auth: grpc.Metadata, clientConstructor = axios) {
     this.client = clientConstructor.default;
-    console.log(this.client);
     const delaySeconds = 10;
 
     this.clientReady = new Promise((resolve, reject) => {
