@@ -1,43 +1,48 @@
-// import * as chai from 'chai';
-// import { default as sinon } from 'ts-sinon';
-// import * as sinonChai from 'sinon-chai';
-// import 'mocha';
+import * as chai from 'chai';
+import { default as sinon } from 'ts-sinon';
+import * as sinonChai from 'sinon-chai';
+import 'mocha';
 
-// import { ClientWrapper } from '../../src/client/client-wrapper';
-// import { Metadata } from 'grpc';
+import { Metadata } from 'grpc';
+import { ClientWrapper } from '../../src/client/client-wrapper';
 
-// chai.use(sinonChai);
+chai.use(sinonChai);
 
-// describe('ClientWrapper', () => {
-//   const expect = chai.expect;
-//   let needleConstructorStub: any;
-//   let metadata: Metadata;
-//   let clientWrapperUnderTest: ClientWrapper;
+describe('ClientWrapper', () => {
+  const expect = chai.expect;
+  let clientStub: any;
+  let constructorStub: any;
+  let metadata: Metadata;
+  let clientWrapperUnderTest: ClientWrapper;
 
-//   beforeEach(() => {
-//     needleConstructorStub = sinon.stub();
-//     needleConstructorStub.defaults = sinon.stub();
-//   });
+  beforeEach(() => {
+    clientStub = sinon.stub();
+    clientStub.get = sinon.stub(),
+    clientStub.post = sinon.stub(),
+    clientStub.patch = sinon.stub(),
+    clientStub.delete = sinon.stub(),
+    
+    constructorStub = sinon.stub();
+    constructorStub.default = sinon.stub();
+    constructorStub.default.returns(clientStub);
+  });
 
-//   it('authenticates', () => {
-//     // Construct grpc metadata and assert the client was authenticated.
-//     const expectedCallArgs = { user_agent: 'Some/UserAgent String' };
-//     metadata = new Metadata();
-//     metadata.add('userAgent', expectedCallArgs.user_agent);
+  describe('constructor', () => {
+    it('should authenticate', () => {
+      metadata = new Metadata();
+      metadata.add('clientId', 'sampleId');
+      metadata.add('clientSecret', 'sampleSecret');
+      metadata.add('redirectUrl', 'sampleUrl');
+      metadata.add('refreshToken', 'sampleToken');
 
-//     // Assert that the underlying API client was authenticated correctly.
-//     clientWrapperUnderTest = new ClientWrapper(metadata, needleConstructorStub);
-//     expect(needleConstructorStub.defaults).to.have.been.calledWith(expectedCallArgs);
-//   });
-
-//   it('getUserByEmail', () => {
-//     const expectedEmail = 'test@example.com';
-//     clientWrapperUnderTest = new ClientWrapper(metadata, needleConstructorStub);
-//     clientWrapperUnderTest.getUserByEmail(expectedEmail);
-
-//     expect(needleConstructorStub).to.have.been.calledWith(
-//       `https://jsonplaceholder.typicode.com/users?email=${expectedEmail}`,
-//     );
-//   });
-
-// });
+      clientWrapperUnderTest = new ClientWrapper(metadata, constructorStub);
+      expect(clientStub.post).to.have.been.calledWith('https://api.outreach.io/oauth/token', {
+        client_id: 'sampleId',
+        client_secret: 'sampleSecret',
+        redirect_uri: 'sampleUrl',
+        grant_type: 'refresh_token',
+        refresh_token: 'sampleToken',
+      });
+    });
+  });
+});

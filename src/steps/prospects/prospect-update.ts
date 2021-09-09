@@ -37,6 +37,16 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
     'availableAt',
   ];
 
+  private listFields = [
+    'homePhones',
+    'mobilePhones',
+    'otherPhones',
+    'tags',
+    'voipPhones',
+    'workPhones',
+    'emails',
+  ];
+
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     const id: any = stepData.id;
@@ -56,6 +66,8 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
     Object.keys(account).forEach((key) => {
       if (this.dateTimeFields.includes(key) || this.dateFields.includes(key)) {
         account[key] = this.formatDate(account[key]);
+      } else if (this.listFields.includes(key)) {
+        account[key] = this.formatList(account[key]);
       }
     });
     return account;
@@ -63,6 +75,10 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
 
   formatDate(date: string): string {
     return moment(date).format('YYYY-MM-DD');
+  }
+
+  formatList(list: string): string[] {
+    return list.replace(' ', '').split(',');
   }
 
 }
