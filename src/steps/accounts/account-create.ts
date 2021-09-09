@@ -26,6 +26,10 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
     'foundedAt',
   ];
 
+  private listFields = [
+    'tags',
+  ];
+
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     let account: any = stepData.account;
@@ -44,6 +48,8 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
     Object.keys(account).forEach((key) => {
       if (this.dateTimeFields.includes(key)) {
         account[key] = this.formatDate(account[key]);
+      } else if (this.listFields.includes(key)) {
+        account[key] = this.formatList(account[key]);
       }
     });
     return account;
@@ -51,6 +57,10 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
 
   formatDate(date: string): string {
     return moment(date).format('YYYY-MM-DD');
+  }
+
+  formatList(list: string): string[] {
+    return list.replace(' ', '').split(',');
   }
 
 }
