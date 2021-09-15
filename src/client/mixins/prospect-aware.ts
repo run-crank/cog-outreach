@@ -37,16 +37,23 @@ export class ProspectAwareMixin {
     });
   }
 
-  public async createProspect(prospect: Record<string, any>): Promise<Record<string, any>> {
+  public async createProspect(prospect: Record<string, any>, relationship: Record<string, any> = null): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.post('/prospects', {
+        let requestBody = {
           data: {
             type: 'prospect',
             attributes: prospect,
           },
-        });
+        }
+
+        if (relationship) {
+          requestBody.data['relationships'] = relationship;
+        }
+
+
+        const response = await this.client.post('/prospects', requestBody);
         resolve(response.data);
       } catch (e) {
         if (e.response.data) {
@@ -58,17 +65,22 @@ export class ProspectAwareMixin {
     });
   }
 
-  public async updateProspect(id: string, prospect: Record<string, any>): Promise<Record<string, any>> {
+  public async updateProspect(id: string, prospect: Record<string, any>, relationship: Record<string, any> = null): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.patch(`/prospects/${id}`, {
+        let requestBody = {
           data: {
             type: 'prospect',
-            id: +id,
             attributes: prospect,
           },
-        });
+        }
+
+        if (relationship) {
+          requestBody.data['relationships'] = relationship;
+        }
+
+        const response = await this.client.patch(`/prospects/${id}`, requestBody);
         resolve(response.data);
       } catch (e) {
         if (e.response.data) {

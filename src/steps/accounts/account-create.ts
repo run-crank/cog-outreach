@@ -30,13 +30,23 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
     'tags',
   ];
 
+  private relationshipFields = [
+    'owner',
+  ]
+
+  private relationshipMap = {
+    owner: 'user',
+  }
+
+  private relationship = {};
+
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     let account: any = stepData.account;
 
     try {
       account = this.validateObject(account);
-      const result = await this.client.createAccount(account);
+      const result = await this.client.createAccount(account, this.relationship);
       const record = this.keyValue('account', 'Created Account', { Id: result.data.id });
       return this.pass('Successfully created Account with ID %s', [result.data.id], [record]);
     } catch (e) {
@@ -50,6 +60,9 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
         account[key] = this.formatDate(account[key]);
       } else if (this.listFields.includes(key)) {
         account[key] = this.formatList(account[key]);
+      } else if (this.relationshipFields.includes(key)) {
+        this.setRelationships(key, account);
+        delete account[key];
       }
     });
     return account;
@@ -61,6 +74,16 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
 
   formatList(list: string): string[] {
     return list.replace(' ', '').split(',');
+  }
+
+  setRelationships(key: string, account): void {
+    let relationshipType = this.relationshipMap[key] || key;
+    this.relationship[key] = {
+      data: {
+        type: relationshipType,
+        id: account[key]
+      }
+    };
   }
 
 }
