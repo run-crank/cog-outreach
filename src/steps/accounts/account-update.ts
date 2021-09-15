@@ -35,6 +35,16 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
     'tags',
   ];
 
+  private relationshipFields = [
+    'owner',
+  ];
+
+  private relationshipMap = {
+    owner: 'user',
+  };
+
+  private relationship = {};
+
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     const id: any = stepData.id;
@@ -42,7 +52,7 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
 
     try {
       account = this.validateObject(account);
-      const result = await this.client.updateAccount(id, account);
+      const result = await this.client.updateAccount(id, account, this.relationship);
       const record = this.keyValue('account', 'Created Account', { Id: result.data.id });
       return this.pass('Successfully created Account with ID %s', [result.data.id], [record]);
     } catch (e) {
@@ -56,6 +66,9 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
         account[key] = this.formatDate(account[key]);
       } else if (this.listFields.includes(key)) {
         account[key] = this.formatList(account[key]);
+      } else if (this.relationshipFields.includes(key)) {
+        this.setRelationships(key, account);
+        delete account[key];
       }
     });
     return account;
@@ -69,6 +82,15 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
     return list.replace(' ', '').split(',');
   }
 
+  setRelationships(key: string, account): void {
+    const relationshipType = this.relationshipMap[key] || key;
+    this.relationship[key] = {
+      data: {
+        type: relationshipType,
+        id: account[key],
+      },
+    };
+  }
 }
 
 export { AccountUpdateStep as Step };

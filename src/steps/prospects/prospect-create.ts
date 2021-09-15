@@ -43,13 +43,25 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
     'emails',
   ];
 
+  private relationshipFields = [
+    'owner',
+    'stage',
+    'account',
+  ];
+
+  private relationshipMap = {
+    owner: 'user',
+  };
+
+  private relationship = {};
+
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     let prospect: any = stepData.prospect;
 
     try {
       prospect = this.validateObject(prospect);
-      const result = await this.client.createProspect(prospect);
+      const result = await this.client.createProspect(prospect, this.relationship);
       const record = this.keyValue('prospect', 'Created Prospect', { Id: result.data.id });
       return this.pass('Successfully created Prospect with ID %s', [result.data.id], [record]);
     } catch (e) {
@@ -57,15 +69,18 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
     }
   }
 
-  validateObject(account): any {
-    Object.keys(account).forEach((key) => {
+  validateObject(prospect): any {
+    Object.keys(prospect).forEach((key) => {
       if (this.dateTimeFields.includes(key) || this.dateFields.includes(key)) {
-        account[key] = this.formatDate(account[key]);
+        prospect[key] = this.formatDate(prospect[key]);
       } else if (this.listFields.includes(key)) {
-        account[key] = this.formatList(account[key]);
+        prospect[key] = this.formatList(prospect[key]);
+      } else if (this.relationshipFields.includes(key)) {
+        this.setRelationships(key, prospect);
+        delete prospect[key];
       }
     });
-    return account;
+    return prospect;
   }
 
   formatDate(date: string): string {
@@ -74,6 +89,16 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
 
   formatList(list: string): string[] {
     return list.replace(' ', '').split(',');
+  }
+
+  setRelationships(key: string, prospect): void {
+    const relationshipType = this.relationshipMap[key] || key;
+    this.relationship[key] = {
+      data: {
+        type: relationshipType,
+        id: prospect[key],
+      },
+    };
   }
 
 }
