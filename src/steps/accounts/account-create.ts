@@ -32,11 +32,11 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
 
   private relationshipFields = [
     'owner',
-  ]
+  ];
 
   private relationshipMap = {
     owner: 'user',
-  }
+  };
 
   private relationship = {};
 
@@ -77,12 +77,12 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
   }
 
   setRelationships(key: string, account): void {
-    let relationshipType = this.relationshipMap[key] || key;
+    const relationshipType = this.relationshipMap[key] || key;
     this.relationship[key] = {
       data: {
         type: relationshipType,
-        id: account[key]
-      }
+        id: account[key],
+      },
     };
   }
 

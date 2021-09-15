@@ -41,12 +41,12 @@ export class AccountAwareMixin {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        let requestBody = {
+        const requestBody = {
           data: {
             type: 'account',
             attributes: account,
           },
-        }
+        };
 
         if (relationship) {
           requestBody.data['relationships'] = relationship;
@@ -68,12 +68,12 @@ export class AccountAwareMixin {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        let requestBody = {
+        const requestBody = {
           data: {
             type: 'account',
             attributes: account,
           },
-        }
+        };
 
         if (relationship) {
           requestBody.data['relationships'] = relationship;

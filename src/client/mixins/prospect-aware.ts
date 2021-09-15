@@ -41,17 +41,16 @@ export class ProspectAwareMixin {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        let requestBody = {
+        const requestBody = {
           data: {
             type: 'prospect',
             attributes: prospect,
           },
-        }
+        };
 
         if (relationship) {
           requestBody.data['relationships'] = relationship;
         }
-
 
         const response = await this.client.post('/prospects', requestBody);
         resolve(response.data);
@@ -69,12 +68,12 @@ export class ProspectAwareMixin {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        let requestBody = {
+        const requestBody = {
           data: {
             type: 'prospect',
             attributes: prospect,
           },
-        }
+        };
 
         if (relationship) {
           requestBody.data['relationships'] = relationship;

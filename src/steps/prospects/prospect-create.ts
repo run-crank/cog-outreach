@@ -47,11 +47,11 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
     'owner',
     'stage',
     'account',
-  ]
+  ];
 
   private relationshipMap = {
     owner: 'user',
-  }
+  };
 
   private relationship = {};
 
@@ -92,12 +92,12 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
   }
 
   setRelationships(key: string, prospect): void {
-    let relationshipType = this.relationshipMap[key] || key;
+    const relationshipType = this.relationshipMap[key] || key;
     this.relationship[key] = {
       data: {
         type: relationshipType,
-        id: prospect[key]
-      }
+        id: prospect[key],
+      },
     };
   }
 
