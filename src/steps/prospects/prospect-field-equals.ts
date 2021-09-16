@@ -51,20 +51,32 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
     dynamicFields: true,
   }];
 
+  private relationshipFields = [
+    'owner',
+    'stage',
+    'account',
+  ];
+
   async executeStep(step: Step) {
     const stepData: any = step.getData() ? step.getData().toJavaScript() : {};
     const expectation = stepData.expectation;
     const id = stepData.id;
     const field = stepData.field;
     const operator = stepData.operator || 'be';
+    
+    let actual = null;
 
     try {
       const prospect = await this.client.getProspectById(id);
 
-      // Since empty fields are not being returned by the API, default to undefined
-      // so that checks that are expected to fail will behave as expected
-      const actual = prospect.data.attributes[field]
-        ? prospect.data.attributes[field] : null;
+      // if the field is a relationship field handled the validation here
+      if (this.relationshipFields.includes(field) && prospect.data.relationships && prospect.data.relationships[field]) {
+        actual = prospect.data.relationships[field].data.id.toString();
+      } else {
+        // Since empty fields are not being returned by the API, default to undefined
+        // so that checks that are expected to fail will behave as expected
+        actual = prospect.data.attributes[field] ? prospect.data.attributes[field] : null;
+      }
 
       const record = this.createRecord(prospect);
       const result = this.assert(operator, actual, expectation, field);

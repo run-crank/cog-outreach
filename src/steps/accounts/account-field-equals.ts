@@ -55,6 +55,10 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     dynamicFields: true,
   }];
 
+  private relationshipFields = [
+    'owner',
+  ];
+
   async executeStep(step: Step) {
     const stepData: any = step.getData() ? step.getData().toJavaScript() : {};
     const expectation = stepData.expectation;
@@ -62,15 +66,22 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     const field = stepData.field;
     const operator = stepData.operator || 'be';
 
+    let actual = null;
+
     try {
       const account = await this.client.getAccountById(id);
 
-      // Since empty fields are not being returned by the API, default to undefined
-      // so that checks that are expected to fail will behave as expected
-      const actual = account.data.attributes[field]
-        ? account.data.attributes[field] : null;
-
       const record = this.createRecord(account);
+
+      // if the field is a relationship field handled the validation here
+      if (this.relationshipFields.includes(field) && account.data.relationships && account.data.relationships[field]) {
+        actual = account.data.relationships[field].data.id.toString();
+      } else {
+        // Since empty fields are not being returned by the API, default to undefined
+        // so that checks that are expected to fail will behave as expected
+        actual = account.data.attributes[field] ? account.data.attributes[field] : null;
+      }
+
       const result = this.assert(operator, actual, expectation, field);
 
       return result.valid ? this.pass(result.message, [], [record])

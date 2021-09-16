@@ -71,6 +71,7 @@ export class ProspectAwareMixin {
         const requestBody = {
           data: {
             type: 'prospect',
+            id: +id,
             attributes: prospect,
           },
         };
