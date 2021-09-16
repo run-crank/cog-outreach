@@ -63,7 +63,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
     const id = stepData.id;
     const field = stepData.field;
     const operator = stepData.operator || 'be';
-    
+
     let actual = null;
 
     try {
