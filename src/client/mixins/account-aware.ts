@@ -71,6 +71,7 @@ export class AccountAwareMixin {
         const requestBody = {
           data: {
             type: 'account',
+            id: +id,
             attributes: account,
           },
         };
