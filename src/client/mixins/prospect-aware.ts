@@ -21,12 +21,13 @@ export class ProspectAwareMixin {
     });
   }
 
-  public async getProspectById(id: string): Promise<Record<string, any>> {
+  public async getProspectByEmail(email: string): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
       try {
-        const response = await this.client.get(`/prospects/${id}`);
-        resolve(response.data);
+        // const response = await this.client.get(`/prospects/${id}`);
+        const response = await this.client.get(`/prospects?filter[emails]=${email}`);
+        resolve(response.data.data[0]);
       } catch (e) {
         if (e.response.data) {
           reject(e.response.data.errors.map(error => error.detail).join(', '));

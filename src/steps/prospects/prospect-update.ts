@@ -8,9 +8,9 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
   protected stepExpression: string = 'update an outreach prospect';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
-    field: 'id',
-    type: FieldDefinition.Type.STRING,
-    description: "Prospect's Id",
+    field: 'email',
+    type: FieldDefinition.Type.EMAIL,
+    description: "Prospect's Email",
   }, {
     field: 'prospect',
     type: FieldDefinition.Type.MAP,
@@ -61,12 +61,17 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
 
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
-    const id: any = stepData.id;
-    let prospect: any = stepData.prospect;
+    const email: any = stepData.email;
+    const prospect: any = stepData.prospect;
 
     try {
-      prospect = this.validateObject(prospect);
-      const result = await this.client.updateProspect(id, prospect, this.relationship);
+      const existingProspect = await this.client.getProspectByEmail(email);
+
+      if (existingProspect == undefined || existingProspect == null) {
+        return this.fail('No Account was found with email %s', [email]);
+      }
+
+      const result = await this.client.updateProspect(existingProspect.id, prospect, this.relationship);
       const record = this.keyValue('prospect', 'Updated Prospect', { Id: result.data.id });
       return this.pass('Successfully updated Prospect with ID %s', [result.data.id], [record]);
     } catch (e) {

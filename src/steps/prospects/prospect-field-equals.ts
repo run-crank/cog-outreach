@@ -9,12 +9,12 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
 
   protected stepName: string = 'Check a field on an Outreach prospect';
   // tslint:disable-next-line:max-line-length
-  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on outreach prospect with Id (?<id>.+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
+  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on outreach prospect (?<email>.+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
   protected stepType: StepDefinition.Type = StepDefinition.Type.VALIDATION;
   protected expectedFields: Field[] = [{
-    field: 'id',
-    type: FieldDefinition.Type.STRING,
-    description: "Prospect's Id",
+    field: 'email',
+    type: FieldDefinition.Type.EMAIL,
+    description: "Prospect's Email",
   }, {
     field: 'field',
     type: FieldDefinition.Type.STRING,
@@ -60,22 +60,40 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
   async executeStep(step: Step) {
     const stepData: any = step.getData() ? step.getData().toJavaScript() : {};
     const expectation = stepData.expectation;
-    const id = stepData.id;
+    const email = stepData.email;
     const field = stepData.field;
     const operator = stepData.operator || 'be';
 
     let actual = null;
 
     try {
-      const prospect = await this.client.getProspectById(id);
+      const prospect = await this.client.getProspectByEmail(email);
+
+      if (prospect == undefined || prospect == null) {
+        return this.fail('No Account was found with email %s', [email]);
+      }
+
+      if (!prospect.attributes.hasOwnProperty(field)) {
+        const record = this.createRecord(prospect);
+        return this.fail('The %s field does not exist on Prospect %s', [field, email], [record]);
+      }
+
+      // Handle email field check to so be operator can work instead of just include
+      // It will automatically pass once a prospect is found
+      if (field === 'emails' && operator.toLowerCase() === 'be') {
+        const record = this.createRecord(prospect);
+        const result = this.assert(operator, expectation, expectation, field);
+
+        return this.pass(result.message, [], [record]);
+      }
 
       // if the field is a relationship field handled the validation here
-      if (this.relationshipFields.includes(field) && prospect.data.relationships && prospect.data.relationships[field]) {
-        actual = prospect.data.relationships[field].data.id.toString();
+      if (this.relationshipFields.includes(field) && prospect.relationships && prospect.relationships[field]) {
+        actual = prospect.relationships[field].data.id.toString();
       } else {
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
-        actual = prospect.data.attributes[field] ? prospect.data.attributes[field] : null;
+        actual = prospect.attributes[field] ? prospect.attributes[field] : null;
       }
 
       const record = this.createRecord(prospect);
@@ -98,7 +116,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
 
   public createRecord(prospect): StepRecord {
     const obj = {};
-    Object.keys(prospect.data.attributes).forEach(key => obj[key] = prospect.data.attributes[key]);
+    Object.keys(prospect.attributes).forEach(key => obj[key] = prospect.attributes[key]);
     const record = this.keyValue('prospect', 'Checked Prospect', obj);
     return record;
   }

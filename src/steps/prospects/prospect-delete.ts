@@ -4,12 +4,12 @@ import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinitio
 export class ProspectDeleteStep extends BaseStep implements StepInterface {
 
   protected stepName: string = 'Delete an Outreach Prospect';
-  protected stepExpression: string = 'delete the outreach prospect with Id (?<id>[a-zA-Z0-9_]+)';
+  protected stepExpression: string = 'delete the outreach prospect with email (?<email>.+)';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
-    field: 'id',
-    type: FieldDefinition.Type.STRING,
-    description: "Prospect's Id",
+    field: 'email',
+    type: FieldDefinition.Type.EMAIL,
+    description: "Prospect's Email",
   }];
   protected expectedRecords: ExpectedRecord[] = [{
     id: 'prospect',
@@ -26,9 +26,14 @@ export class ProspectDeleteStep extends BaseStep implements StepInterface {
     const stepData: any = step.getData().toJavaScript();
 
     try {
-      await this.client.deleteProspectById(stepData.id);
-      const record = this.keyValue('prospect', 'Deleted Prospect', { Id: stepData.id });
-      return this.pass('Successfully deleted Prospect with Id %s', [stepData.id], [record]);
+      const existingProspect = await this.client.getProspectByEmail(stepData.email);
+      if (existingProspect == undefined || existingProspect == null) {
+        return this.fail('No Account was found with email %s', [stepData.email]);
+      }
+
+      await this.client.deleteProspectById(existingProspect.id);
+      const record = this.keyValue('prospect', 'Deleted Prospect', { Id: existingProspect.id });
+      return this.pass('Successfully deleted Prospect with Id %s', [existingProspect.id], [record]);
     } catch (e) {
       return this.error('There was a problem deleting the Prospect: %s', [e.toString()]);
     }
