@@ -102,7 +102,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
   public createRecord(account): StepRecord {
     const obj = {};
     Object.keys(account.data.attributes).forEach(key => obj[key] = account.data.attributes[key]);
-    obj['id']=account.data.id;
+    obj['id'] = account.data.id;
     const record = this.keyValue('account', 'Checked Account', obj);
     return record;
   }

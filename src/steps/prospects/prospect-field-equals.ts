@@ -117,7 +117,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
   public createRecord(prospect): StepRecord {
     const obj = {};
     Object.keys(prospect.attributes).forEach(key => obj[key] = prospect.attributes[key]);
-    obj['id']=prospect.data.id;
+    obj['id'] = prospect.data.id;
     const record = this.keyValue('prospect', 'Checked Prospect', obj);
     return record;
   }
