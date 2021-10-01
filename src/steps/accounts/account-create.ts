@@ -1,5 +1,5 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
-import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition, StepRecord } from '../../proto/cog_pb';
+import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
 import * as moment from 'moment';
 export class AccountCreateStep extends BaseStep implements StepInterface {
 
@@ -85,15 +85,6 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
       },
     };
   }
-
-  public createRecord(account): StepRecord {
-    const obj = {};
-    Object.keys(account.data.attributes).forEach(key => obj[key] = account.data.attributes[key]);
-    obj['id'] = account.data.id;
-    const record = this.keyValue('account', 'Checked Account', obj);
-    return record;
-  }
-
 }
 
 export { AccountCreateStep as Step };
