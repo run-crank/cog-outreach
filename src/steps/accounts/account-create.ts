@@ -1,5 +1,5 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
-import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
+import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition, StepRecord } from '../../proto/cog_pb';
 import * as moment from 'moment';
 export class AccountCreateStep extends BaseStep implements StepInterface {
 
@@ -47,7 +47,7 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
     try {
       account = this.validateObject(account);
       const result = await this.client.createAccount(account, this.relationship);
-      const record = this.keyValue('account', 'Created Account', { Id: result.data.id });
+      const record = this.keyValue('account', 'Created Account', { id: result.data.id });
       return this.pass('Successfully created Account with ID %s', [result.data.id], [record]);
     } catch (e) {
       return this.error('There was a problem creating the Account: %s', [e.toString()]);
@@ -84,6 +84,14 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
         id: account[key],
       },
     };
+  }
+
+  public createRecord(account): StepRecord {
+    const obj = {};
+    Object.keys(account.data.attributes).forEach(key => obj[key] = account.data.attributes[key]);
+    obj['id'] = account.data.id;
+    const record = this.keyValue('account', 'Checked Account', obj);
+    return record;
   }
 
 }
