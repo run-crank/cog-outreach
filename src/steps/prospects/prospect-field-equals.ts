@@ -88,7 +88,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
       }
 
       // if the field is a relationship field handled the validation here
-      if (this.relationshipFields.includes(field) && prospect.relationships && prospect.relationships[field]) {
+      if (this.relationshipFields.includes(field) && prospect.relationships && prospect.relationships[field] && prospect.relationships[field].data) {
         actual = prospect.relationships[field].data.id.toString();
       } else {
         // Since empty fields are not being returned by the API, default to undefined

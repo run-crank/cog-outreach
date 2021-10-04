@@ -74,7 +74,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
       const record = this.createRecord(account);
 
       // if the field is a relationship field handled the validation here
-      if (this.relationshipFields.includes(field) && account.data.relationships && account.data.relationships[field]) {
+      if (this.relationshipFields.includes(field) && account.data.relationships && account.data.relationships[field] && account.data.relationships[field].data) {
         actual = account.data.relationships[field].data.id.toString();
       } else {
         // Since empty fields are not being returned by the API, default to undefined
