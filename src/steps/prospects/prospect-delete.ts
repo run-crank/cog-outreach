@@ -32,7 +32,7 @@ export class ProspectDeleteStep extends BaseStep implements StepInterface {
       }
 
       await this.client.deleteProspectById(existingProspect.id);
-      const record = this.keyValue('prospect', 'Deleted Prospect', { Id: existingProspect.id });
+      const record = this.keyValue('prospect', 'Deleted Prospect', { id: existingProspect.id });
       return this.pass('Successfully deleted Prospect with Id %s', [existingProspect.id], [record]);
     } catch (e) {
       return this.error('There was a problem deleting the Prospect: %s', [e.toString()]);
