@@ -72,7 +72,7 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
       }
 
       const result = await this.client.updateProspect(existingProspect.id, prospect, this.relationship);
-      const record = this.keyValue('prospect', 'Updated Prospect', { Id: result.data.id });
+      const record = this.keyValue('prospect', 'Updated Prospect', { id: result.data.id });
       return this.pass('Successfully updated Prospect with ID %s', [result.data.id], [record]);
     } catch (e) {
       return this.error('There was a problem updated the Prospect: %s', [e.toString()]);

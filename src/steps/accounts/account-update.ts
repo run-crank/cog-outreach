@@ -53,7 +53,7 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
     try {
       account = this.validateObject(account);
       const result = await this.client.updateAccount(id, account, this.relationship);
-      const record = this.keyValue('account', 'Created Account', { Id: result.data.id });
+      const record = this.keyValue('account', 'Created Account', { id: result.data.id });
       return this.pass('Successfully created Account with ID %s', [result.data.id], [record]);
     } catch (e) {
       return this.error('There was a problem creating the Account: %s', [e.toString()]);
