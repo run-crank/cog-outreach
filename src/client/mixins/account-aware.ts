@@ -26,7 +26,7 @@ export class AccountAwareMixin {
     return new Promise(async (resolve, reject) => {
       try {
         const response = await this.client.get(`/accounts/${id}`);
-        resolve(response.data);
+        resolve(response.data.data);
       } catch (e) {
         if (e.response.data) {
           reject(e.response.data.errors.map(error => error.detail).join(', '));

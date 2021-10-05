@@ -62,7 +62,7 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
     const email: any = stepData.email;
-    const prospect: any = stepData.prospect;
+    let prospect: any = stepData.prospect;
 
     try {
       const existingProspect = await this.client.getProspectByEmail(email);
@@ -71,9 +71,10 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
         return this.fail('No Account was found with email %s', [email]);
       }
 
+      prospect = this.validateObject(prospect);
       const result = await this.client.updateProspect(existingProspect.id, prospect, this.relationship);
-      const record = this.keyValue('prospect', 'Updated Prospect', { id: result.data.id });
-      return this.pass('Successfully updated Prospect with ID %s', [result.data.id], [record]);
+      const record = this.keyValue('prospect', 'Updated Prospect', { id: result.id });
+      return this.pass('Successfully updated Prospect with ID %s', [result.id], [record]);
     } catch (e) {
       return this.error('There was a problem updated the Prospect: %s', [e.toString()]);
     }

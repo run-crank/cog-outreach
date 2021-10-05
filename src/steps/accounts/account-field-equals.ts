@@ -70,16 +70,15 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
 
     try {
       const account = await this.client.getAccountById(id);
-
       const record = this.createRecord(account);
 
       // if the field is a relationship field handled the validation here
-      if (this.relationshipFields.includes(field) && account.data.relationships && account.data.relationships[field] && account.data.relationships[field].data) {
-        actual = account.data.relationships[field].data.id.toString();
+      if (this.relationshipFields.includes(field) && account.relationships && account.relationships[field] && account.relationships[field].data) {
+        actual = account.relationships[field].data.id.toString();
       } else {
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
-        actual = account.data.attributes[field] ? account.data.attributes[field] : null;
+        actual = account.attributes[field] ? account.attributes[field] : null;
       }
 
       const result = this.assert(operator, actual, expectation, field);
@@ -101,8 +100,8 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
 
   public createRecord(account): StepRecord {
     const obj = {};
-    Object.keys(account.data.attributes).forEach(key => obj[key] = account.data.attributes[key]);
-    obj['id'] = account.data.id;
+    Object.keys(account.attributes).forEach(key => obj[key] = account.attributes[key]);
+    obj['id'] = account.id;
     const record = this.keyValue('account', 'Checked Account', obj);
     return record;
   }
