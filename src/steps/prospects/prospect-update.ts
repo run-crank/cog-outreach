@@ -76,7 +76,7 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
       const record = this.keyValue('prospect', 'Updated Prospect', { id: result.id });
       return this.pass('Successfully updated Prospect with ID %s', [result.id], [record]);
     } catch (e) {
-      return this.error('There was a problem updated the Prospect: %s', [e.toString()]);
+      return this.error('There was a problem updating the Prospect: %s', [e.toString()]);
     }
   }
 

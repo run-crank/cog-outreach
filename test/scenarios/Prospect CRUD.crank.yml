@@ -1,0 +1,36 @@
+scenario: Prospect CRUD Steps
+description: >
+  This scenario proves that contact creation, checking, and deletion steps work
+  as expected.
+
+tokens:
+  test.firstName: Emails
+  test.lastName: Test
+  test.email: test@test.com
+
+steps:
+- step: Given I create an Outreach Prospect
+  data:
+    prospect:
+      firstName: '{{test.firstName}}'
+      lastName: '{{test.lastName}}'
+      owner: 1
+      stage: 1
+      account: 2086
+      emails: '7{{test.email}}'
+      emailsOptStatus: 'opted_in'
+- step: Given I update an Outreach Prospect
+  data:
+    email: '7{{test.email}}'
+    prospect:
+      firstName: '{{test.firstName}}'
+      lastName: '{{test.lastName}}'
+      owner: 1
+      stage: 1
+      account: 2086
+      emails: '7{{test.email}}'
+      emailsOptStatus: 'opted_out'
+- step: Then the emails field on outreach prospect 7{{test.email}} should be 7{{test.email}}
+- step: Then the owner field on outreach prospect 7{{test.email}} should be 1
+- step: Then the emailsOptStatus field on outreach prospect 7{{test.email}} should be opted_out
+- step: Finally, delete the outreach prospect with email 7{{test.email}}

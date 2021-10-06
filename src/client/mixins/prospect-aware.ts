@@ -54,7 +54,7 @@ export class ProspectAwareMixin {
         }
 
         const response = await this.client.post('/prospects', requestBody);
-        resolve(response.data);
+        resolve(response.data.data);
       } catch (e) {
         if (e.response.data) {
           reject(e.response.data.errors.map(error => error.detail).join(', '));
@@ -77,12 +77,12 @@ export class ProspectAwareMixin {
           },
         };
 
-        if (relationship) {
+        if (Object.keys(relationship).length > 0) {
           requestBody.data['relationships'] = relationship;
         }
 
         const response = await this.client.patch(`/prospects/${id}`, requestBody);
-        resolve(response.data);
+        resolve(response.data.data);
       } catch (e) {
         if (e.response.data) {
           reject(e.response.data.errors.map(error => error.detail).join(', '));
