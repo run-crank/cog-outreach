@@ -36,6 +36,10 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     id: 'account',
     type: RecordDefinition.Type.KEYVALUE,
     fields: [{
+      field: 'id',
+      type: FieldDefinition.Type.STRING,
+      description: "Account's Id",
+    }, {
       field: 'name',
       type: FieldDefinition.Type.NUMERIC,
       description: 'The Account\'s ID',

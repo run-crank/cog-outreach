@@ -36,6 +36,10 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
     id: 'prospect',
     type: RecordDefinition.Type.KEYVALUE,
     fields: [{
+      field: 'id',
+      type: FieldDefinition.Type.STRING,
+      description: "Prospect's Outreach ID",
+    }, {
       field: 'name',
       type: FieldDefinition.Type.NUMERIC,
       description: 'The Prospect\'s ID',
