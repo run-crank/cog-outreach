@@ -90,7 +90,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
       // It will automatically pass once a prospect is found
       if (this.listFields.includes(field) && operator.toLowerCase() === 'be') {
         const record = this.createRecord(prospect);
-        if(prospect.attributes[field].includes(expectation)) {
+        if (prospect.attributes[field].includes(expectation)) {
           const result = this.assert(operator, expectation, expectation, field);
           return this.pass(result.message, [], [record]);
         }
