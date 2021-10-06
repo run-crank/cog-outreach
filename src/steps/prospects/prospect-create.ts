@@ -62,8 +62,8 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
     try {
       prospect = this.validateObject(prospect);
       const result = await this.client.createProspect(prospect, this.relationship);
-      const record = this.keyValue('prospect', 'Created Prospect', { id: result.data.id });
-      return this.pass('Successfully created Prospect with ID %s', [result.data.id], [record]);
+      const record = this.keyValue('prospect', 'Created Prospect', { id: result.id });
+      return this.pass('Successfully created Prospect with ID %s', [result.id], [record]);
     } catch (e) {
       return this.error('There was a problem creating the Prospect: %s', [e.toString()]);
     }

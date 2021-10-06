@@ -72,11 +72,6 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
         return this.fail('No Prospect was found with email %s', [email]);
       }
 
-      if (!prospect.attributes.hasOwnProperty(field)) {
-        const record = this.createRecord(prospect);
-        return this.fail('The %s field does not exist on Prospect %s', [field, email], [record]);
-      }
-
       // Handle email field check to so be operator can work instead of just include
       // It will automatically pass once a prospect is found
       if (field === 'emails' && operator.toLowerCase() === 'be') {
@@ -90,6 +85,10 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
       if (this.relationshipFields.includes(field) && prospect.relationships && prospect.relationships[field] && prospect.relationships[field].data) {
         actual = prospect.relationships[field].data.id.toString();
       } else {
+        if (!prospect.attributes.hasOwnProperty(field)) {
+          const record = this.createRecord(prospect);
+          return this.fail('The %s field does not exist on Prospect %s', [field, email], [record]);
+        }
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
         actual = prospect.attributes[field] ? prospect.attributes[field] : null;
