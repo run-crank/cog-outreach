@@ -63,6 +63,10 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     'owner',
   ];
 
+  private listFields = [
+    'tags',
+  ];
+
   async executeStep(step: Step) {
     const stepData: any = step.getData() ? step.getData().toJavaScript() : {};
     const expectation = stepData.expectation;
@@ -76,6 +80,16 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
       const account = await this.client.getAccountById(id);
       if (account == undefined || account == null) {
         return this.fail('No Account was found with id %s', [id]);
+      }
+
+      // Handle email field check to so be operator can work instead of just include
+      // It will automatically pass once a prospect is found
+      if (this.listFields.includes(field) && operator.toLowerCase() === 'be') {
+        const record = this.createRecord(account);
+        if(account.attributes[field].includes(expectation)) {
+          const result = this.assert(operator, expectation, expectation, field);
+          return this.pass(result.message, [], [record]);
+        }
       }
 
       // if the field is a relationship field handled the validation here
