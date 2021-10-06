@@ -53,7 +53,7 @@ export class AccountAwareMixin {
         }
 
         const response = await this.client.post('/accounts', requestBody);
-        resolve(response.data);
+        resolve(response.data.data);
       } catch (e) {
         if (e.response.data) {
           reject(e.response.data.errors.map(error => error.detail).join(', '));
@@ -81,7 +81,7 @@ export class AccountAwareMixin {
         }
 
         const response = await this.client.patch(`/accounts/${id}`, requestBody);
-        resolve(response.data);
+        resolve(response.data.data);
       } catch (e) {
         if (e.response.data) {
           reject(e.response.data.errors.map(error => error.detail).join(', '));
