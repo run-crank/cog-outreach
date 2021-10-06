@@ -20,7 +20,7 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
     id: 'prospect',
     type: RecordDefinition.Type.KEYVALUE,
     fields: [{
-      field: 'Id',
+      field: 'id',
       type: FieldDefinition.Type.STRING,
       description: "Prospect's Outreach ID",
     }],

@@ -36,6 +36,10 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
     id: 'prospect',
     type: RecordDefinition.Type.KEYVALUE,
     fields: [{
+      field: 'id',
+      type: FieldDefinition.Type.STRING,
+      description: "Prospect's Outreach ID",
+    }, {
       field: 'name',
       type: FieldDefinition.Type.NUMERIC,
       description: 'The Prospect\'s ID',
@@ -57,6 +61,16 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
     'account',
   ];
 
+  private listFields = [
+    'homePhones',
+    'mobilePhones',
+    'otherPhones',
+    'tags',
+    'voipPhones',
+    'workPhones',
+    'emails',
+  ];
+
   async executeStep(step: Step) {
     const stepData: any = step.getData() ? step.getData().toJavaScript() : {};
     const expectation = stepData.expectation;
@@ -74,11 +88,12 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
 
       // Handle email field check to so be operator can work instead of just include
       // It will automatically pass once a prospect is found
-      if (field === 'emails' && operator.toLowerCase() === 'be') {
+      if (this.listFields.includes(field) && operator.toLowerCase() === 'be') {
         const record = this.createRecord(prospect);
-        const result = this.assert(operator, expectation, expectation, field);
-
-        return this.pass(result.message, [], [record]);
+        if (prospect.attributes[field].includes(expectation)) {
+          const result = this.assert(operator, expectation, expectation, field);
+          return this.pass(result.message, [], [record]);
+        }
       }
 
       // if the field is a relationship field handled the validation here
