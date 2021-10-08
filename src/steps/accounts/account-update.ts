@@ -51,6 +51,12 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
     let account: any = stepData.account;
 
     try {
+      const existingAccount = await this.client.getAccountById(id);
+
+      if (existingAccount == undefined || existingAccount == null) {
+        return this.fail('No Account was found with id %s', [id]);
+      }
+
       account = this.validateObject(account);
       const result = await this.client.updateAccount(id, account, this.relationship);
       const record = this.keyValue('account', 'Updated Account', { id: result.id });

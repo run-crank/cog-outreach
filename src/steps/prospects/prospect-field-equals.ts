@@ -106,11 +106,11 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
         }
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
-        actual = prospect.attributes[field] ? prospect.attributes[field] : null;
+        actual = prospect.attributes[field] !== '' || prospect.attributes[field] !== null || prospect.attributes[field] !== undefined ? prospect.attributes[field] : null;
       }
 
       const record = this.createRecord(prospect);
-      const result = this.assert(operator, actual, expectation, field);
+      const result = this.assert(operator, actual.toString(), expectation.toString(), field);
 
       return result.valid ? this.pass(result.message, [], [record])
         : this.fail(result.message, [], [record]);
@@ -129,8 +129,17 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
 
   public createRecord(prospect): StepRecord {
     const obj = {};
+
+    // Set attributes on structured data
     Object.keys(prospect.attributes).forEach(key => obj[key] = prospect.attributes[key]);
     obj['id'] = prospect.id;
+
+    // Set relationship ids on structured data
+    this.relationshipFields.forEach((key) => {
+      if (Object.keys(prospect.relationships[key]).includes('data')) {
+        obj[key] = prospect.relationships[key].data.id || null;
+      }
+    });
     const record = this.keyValue('prospect', 'Checked Prospect', obj);
     return record;
   }

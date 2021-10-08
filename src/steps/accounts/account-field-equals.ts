@@ -102,11 +102,11 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
         }
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
-        actual = account.attributes[field] ? account.attributes[field] : null;
+        actual = account.attributes[field] !== '' || account.attributes[field] !== null || account.attributes[field] !== undefined ? account.attributes[field] : null;
       }
 
       const record = this.createRecord(account);
-      const result = this.assert(operator, actual, expectation, field);
+      const result = this.assert(operator, actual.toString(), expectation.toString(), field);
 
       return result.valid ? this.pass(result.message, [], [record])
         : this.fail(result.message, [], [record]);
@@ -125,8 +125,17 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
 
   public createRecord(account): StepRecord {
     const obj = {};
+
+    // Set attributes on structured data
     Object.keys(account.attributes).forEach(key => obj[key] = account.attributes[key]);
     obj['id'] = account.id;
+
+    // Set relationship ids on structured data
+    this.relationshipFields.forEach((key) => {
+      if (Object.keys(account.relationships[key]).includes('data')) {
+        obj[key] = account.relationships[key].data.id || null;
+      }
+    });
     const record = this.keyValue('account', 'Checked Account', obj);
     return record;
   }
