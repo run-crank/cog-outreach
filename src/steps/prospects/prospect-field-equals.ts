@@ -136,7 +136,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
 
     // Set relationship ids on structured data
     this.relationshipFields.forEach((key) => {
-      if (Object.keys(prospect.relationships[key]).includes('data')) {
+      if (Object.keys(prospect.relationships).includes(key) && Object.keys(prospect.relationships[key]).includes('data') && prospect.relationships[key].data !== null) {
         obj[key] = prospect.relationships[key].data.id || null;
       }
     });
