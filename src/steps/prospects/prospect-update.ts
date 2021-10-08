@@ -68,7 +68,7 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
       const existingProspect = await this.client.getProspectByEmail(email);
 
       if (existingProspect == undefined || existingProspect == null) {
-        return this.fail('No Account was found with email %s', [email]);
+        return this.fail('No Prospect was found with email %s', [email]);
       }
 
       prospect = this.validateObject(prospect);
