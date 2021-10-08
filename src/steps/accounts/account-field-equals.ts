@@ -102,11 +102,11 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
         }
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
-        actual = account.attributes[field] !== '' || account.attributes[field] !== null || account.attributes[field] !== undefined ? account.attributes[field] : null;
+        actual = account.attributes[field] === null || account.attributes[field] === undefined ? 'null' : account.attributes[field];
       }
 
       const record = this.createRecord(account);
-      const result = this.assert(operator, actual.toString(), expectation.toString(), field);
+      const result = this.assert(operator, actual, expectation, field);
 
       return result.valid ? this.pass(result.message, [], [record])
         : this.fail(result.message, [], [record]);
