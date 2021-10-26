@@ -154,9 +154,11 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     const records = [];
     accounts.forEach((account) => {
       delete account.relationships;
+      account.attributes['id'] = account.id;
       records.push(account.attributes);
     });
     const headers = {};
+    headers['id'] = 'Id';
     Object.keys(accounts[0].attributes).forEach(key => headers[key] = titleCase(key));
     return this.table('matchedAccounts', 'Matched Accounts', headers, records);
   }
