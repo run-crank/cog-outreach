@@ -86,10 +86,10 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
       const accounts = await this.client.getAccountsByIdentifier(idField, identifier);
       if (accounts.length === 0) {
         // If the client does not return an account, return an error.
-        return this.fail('No Account was found with %s %s', [field, identifier]);
+        return this.fail('No Account was found with %s %s', [idField, identifier]);
       } else if (accounts.length > 1) {
         // If the client returns more than one account, return an error.
-        return this.fail('More than one account matches %s %s', [field, identifier], [this.createRecords(accounts)]);
+        return this.fail('More than one account matches %s %s', [idField, identifier], [this.createRecords(accounts)]);
       }
 
       // Handle email field check to so be operator can work instead of just include
