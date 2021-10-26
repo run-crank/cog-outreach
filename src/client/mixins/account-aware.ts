@@ -37,6 +37,22 @@ export class AccountAwareMixin {
     });
   }
 
+  public async getAccountsByIdentifier(idField: string, identifier: string): Promise<Record<string, any>[]> {
+    await this.clientReady;
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await this.client.get(`/accounts?filter[${idField}]=${identifier}`);
+        resolve(response.data.data);
+      } catch (e) {
+        if (e.response.data) {
+          reject(e.response.data.errors.map(error => error.detail).join(', '));
+        } else {
+          reject(e);
+        }
+      }
+    });
+  }
+
   public async createAccount(account: Record<string, any>, relationship: Record<string, any> = null): Promise<Record<string, any>> {
     await this.clientReady;
     return new Promise(async (resolve, reject) => {
