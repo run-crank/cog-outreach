@@ -15,11 +15,11 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
   protected expectedFields: Field[] = [{
     field: 'idField',
     type: FieldDefinition.Type.STRING,
-    description: "The field used to search/identify the account",
+    description: 'The field used to search/identify the account',
   }, {
     field: 'identifier',
     type: FieldDefinition.Type.ANYSCALAR,
-    description: "The value of the id field to use when searching",
+    description: 'The value of the id field to use when searching',
   }, {
     field: 'field',
     type: FieldDefinition.Type.STRING,
@@ -158,7 +158,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
       records.push(account.attributes);
     });
     const headers = {};
-    headers['id'] = "Id";
+    headers['id'] = 'Id';
     Object.keys(accounts[0].attributes).forEach(key => headers[key] = titleCase(key));
     return this.table('matchedAccounts', 'Matched Accounts', headers, records);
   }
