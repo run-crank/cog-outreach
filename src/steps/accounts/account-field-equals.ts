@@ -4,17 +4,22 @@ import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-
 import { Step, FieldDefinition, StepDefinition, RecordDefinition, StepRecord } from '../../proto/cog_pb';
 import * as util from '@run-crank/utilities';
 import { baseOperators } from '../../client/constants/operators';
+import { titleCase } from 'title-case';
 
 export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
 
   protected stepName: string = 'Check a field on an Outreach account';
   // tslint:disable-next-line:max-line-length
-  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on outreach account with id (?<id>.+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
+  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on outreach account with (?<idField>[a-zA-Z0-9_-]+) (?<identifier>[a-zA-Z0-9_-]+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
   protected stepType: StepDefinition.Type = StepDefinition.Type.VALIDATION;
   protected expectedFields: Field[] = [{
-    field: 'id',
+    field: 'idField',
     type: FieldDefinition.Type.STRING,
-    description: "Account's Id",
+    description: 'The field used to search/identify the account',
+  }, {
+    field: 'identifier',
+    type: FieldDefinition.Type.ANYSCALAR,
+    description: 'The value of the id field to use when searching',
   }, {
     field: 'field',
     type: FieldDefinition.Type.STRING,
@@ -70,42 +75,47 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
   async executeStep(step: Step) {
     const stepData: any = step.getData() ? step.getData().toJavaScript() : {};
     const expectation = stepData.expectation;
-    const id = stepData.id;
+    const idField = stepData.idField;
+    const identifier = stepData.identifier;
     const field = stepData.field;
     const operator = stepData.operator || 'be';
 
     let actual = null;
 
     try {
-      const account = await this.client.getAccountById(id);
-      if (account == undefined || account == null) {
-        return this.fail('No Account was found with id %s', [id]);
+      const accounts = await this.client.getAccountsByIdentifier(idField, identifier);
+      if (accounts.length === 0) {
+        // If the client does not return an account, return an error.
+        return this.fail('No Account was found with %s %s', [field, identifier]);
+      } else if (accounts.length > 1) {
+        // If the client returns more than one account, return an error.
+        return this.fail('More than one account matches %s %s', [field, identifier], [this.createRecords(accounts)]);
       }
 
       // Handle email field check to so be operator can work instead of just include
       // It will automatically pass once a prospect is found
       if (this.listFields.includes(field) && operator.toLowerCase() === 'be') {
-        const record = this.createRecord(account);
-        if (account.attributes[field].includes(expectation)) {
+        const record = this.createRecord(accounts[0]);
+        if (accounts[0].attributes[field].includes(expectation)) {
           const result = this.assert(operator, expectation, expectation, field);
           return this.pass(result.message, [], [record]);
         }
       }
 
       // if the field is a relationship field handled the validation here
-      if (this.relationshipFields.includes(field) && account.relationships && account.relationships[field] && account.relationships[field].data) {
-        actual = account.relationships[field].data.id.toString();
+      if (this.relationshipFields.includes(field) && accounts[0].relationships && accounts[0].relationships[field] && accounts[0].relationships[field].data) {
+        actual = accounts[0].relationships[field].data.id.toString();
       } else {
-        if (!account.attributes.hasOwnProperty(field)) {
-          const record = this.createRecord(account);
-          return this.fail('The %s field does not exist on Prospect %s', [field, id], [record]);
+        if (!accounts[0].attributes.hasOwnProperty(field)) {
+          const record = this.createRecord(accounts[0]);
+          return this.fail('The %s field does not exist on Prospect with %s %s', [field, idField, identifier], [record]);
         }
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
-        actual = account.attributes[field] === null || account.attributes[field] === undefined ? 'null' : account.attributes[field];
+        actual = accounts[0].attributes[field] === null || accounts[0].attributes[field] === undefined ? 'null' : accounts[0].attributes[field];
       }
 
-      const record = this.createRecord(account);
+      const record = this.createRecord(accounts[0]);
       const result = this.assert(operator, actual, expectation, field);
 
       return result.valid ? this.pass(result.message, [], [record])
@@ -123,7 +133,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     }
   }
 
-  public createRecord(account): StepRecord {
+  createRecord(account): StepRecord {
     const obj = {};
 
     // Set attributes on structured data
@@ -138,6 +148,19 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     });
     const record = this.keyValue('account', 'Checked Account', obj);
     return record;
+  }
+
+  createRecords(accounts: Record<string, any>[]) {
+    const records = [];
+    accounts.forEach((account) => {
+      delete account.relationships;
+      account.attributes['id'] = account.id;
+      records.push(account.attributes);
+    });
+    const headers = {};
+    headers['id'] = 'Id';
+    Object.keys(accounts[0].attributes).forEach(key => headers[key] = titleCase(key));
+    return this.table('matchedAccounts', 'Matched Accounts', headers, records);
   }
 }
 
