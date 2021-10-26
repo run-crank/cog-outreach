@@ -1,6 +1,7 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
 import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
 import * as moment from 'moment';
+import { titleCase } from 'title-case';
 
 export class AccountUpdateStep extends BaseStep implements StepInterface {
 
@@ -8,9 +9,13 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
   protected stepExpression: string = 'update an outreach account';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
   protected expectedFields: Field[] = [{
-    field: 'id',
+    field: 'idField',
     type: FieldDefinition.Type.STRING,
-    description: "Account's Id",
+    description: 'The field used to search/identify the account',
+  }, {
+    field: 'identifier',
+    type: FieldDefinition.Type.ANYSCALAR,
+    description: 'The value of the id field to use when searching',
   }, {
     field: 'account',
     type: FieldDefinition.Type.MAP,
@@ -47,20 +52,24 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
 
   async executeStep(step: Step): Promise<RunStepResponse> {
     const stepData: any = step.getData().toJavaScript();
-    const id: any = stepData.id;
+    const idField = stepData.idField;
+    const identifier = stepData.identifier;
     let account: any = stepData.account;
 
     try {
-      const existingAccount = await this.client.getAccountById(id);
-
-      if (existingAccount == undefined || existingAccount == null) {
-        return this.fail('No Account was found with id %s', [id]);
+      const accounts = await this.client.getAccountsByIdentifier(idField, identifier);
+      if (accounts.length === 0) {
+        // If the client does not return an account, return an error.
+        return this.fail('No Account was found with %s %s', [idField, identifier]);
+      } else if (accounts.length > 1) {
+        // If the client returns more than one account, return an error.
+        return this.fail('More than one account matches %s %s', [idField, identifier], [this.createRecords(accounts)]);
       }
 
       account = this.validateObject(account);
-      const result = await this.client.updateAccount(id, account, this.relationship);
+      const result = await this.client.updateAccount(accounts[0].id, account, this.relationship);
       const record = this.keyValue('account', 'Updated Account', { id: result.id });
-      return this.pass('Successfully updated Account with ID %s', [result.id], [record]);
+      return this.pass('Successfully updated Account with %s %s', [idField, identifier], [record]);
     } catch (e) {
       return this.error('There was a problem updating the Account: %s', [e.toString()]);
     }
@@ -96,6 +105,19 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
         id: account[key],
       },
     };
+  }
+
+  createRecords(accounts: Record<string, any>[]) {
+    const records = [];
+    accounts.forEach((account) => {
+      delete account.relationships;
+      account.attributes['id'] = account.id;
+      records.push(account.attributes);
+    });
+    const headers = {};
+    headers['id'] = 'Id';
+    Object.keys(accounts[0].attributes).forEach(key => headers[key] = titleCase(key));
+    return this.table('matchedAccounts', 'Matched Accounts', headers, records);
   }
 }
 
