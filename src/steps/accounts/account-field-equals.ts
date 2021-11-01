@@ -10,7 +10,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
 
   protected stepName: string = 'Check a field on an Outreach account';
   // tslint:disable-next-line:max-line-length
-  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on outreach account with (?<idField>[a-zA-Z0-9_-]+) (?<identifier>[a-zA-Z0-9_-]+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
+  protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on outreach account with (?<idField>[a-zA-Z0-9_-]+) (?<identifier>.+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
   protected stepType: StepDefinition.Type = StepDefinition.Type.VALIDATION;
   protected expectedFields: Field[] = [{
     field: 'idField',
@@ -83,7 +83,14 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     let actual = null;
 
     try {
-      const accounts = await this.client.getAccountsByIdentifier(idField, identifier);
+      let accounts = [];
+      if (idField === 'id') {
+        const idAccount = await this.client.getAccountById(identifier);
+        accounts.push(idAccount);
+      } else {
+        accounts = await this.client.getAccountsByIdentifier(idField, identifier);
+      }
+
       if (accounts.length === 0) {
         // If the client does not return an account, return an error.
         return this.fail('No Account was found with %s %s', [idField, identifier]);

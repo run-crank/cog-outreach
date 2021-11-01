@@ -57,7 +57,14 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
     let account: any = stepData.account;
 
     try {
-      const accounts = await this.client.getAccountsByIdentifier(idField, identifier);
+      let accounts = [];
+      if (idField === 'id') {
+        const idAccount = await this.client.getAccountById(identifier);
+        accounts.push(idAccount);
+      } else {
+        accounts = await this.client.getAccountsByIdentifier(idField, identifier);
+      }
+
       if (accounts.length === 0) {
         // If the client does not return an account, return an error.
         return this.fail('No Account was found with %s %s', [idField, identifier]);
