@@ -40,7 +40,7 @@ export class AccountDeleteStep extends BaseStep implements StepInterface {
       } else {
         accounts = await this.client.getAccountsByIdentifier(idField, identifier);
       }
-      
+
       if (accounts.length === 0) {
         // If the client does not return an account, return an error.
         return this.fail('No Account was found with %s %s', [idField, identifier]);
