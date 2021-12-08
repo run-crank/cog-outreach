@@ -10,7 +10,7 @@ import { ClientWrapper } from '../client/client-wrapper';
 import { ICogServiceServer } from '../proto/cog_grpc_pb';
 import {
   ManifestRequest, CogManifest, Step, RunStepRequest, RunStepResponse, FieldDefinition,
-  StepDefinition
+  StepDefinition,
 } from '../proto/cog_pb';
 
 export class Cog implements ICogServiceServer {
@@ -219,7 +219,7 @@ export class Cog implements ICogServiceServer {
   /**
    * Helper method to instantiate an API client wrapper for this Cog.
    */
-   private getClientWrapper(auth: grpc.Metadata, idMap: {} = null) {
+  private getClientWrapper(auth: grpc.Metadata, idMap: {} = null) {
     if (this.redisClient) {
       const client = new ClientWrapper(auth);
       return new this.clientWrapperClass(client, this.redisClient, idMap);
