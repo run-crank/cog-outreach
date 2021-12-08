@@ -18,13 +18,16 @@
 //   beforeEach(() => {
 //     clientStub = sinon.stub();
 //     clientStub.get = sinon.stub(),
-//     clientStub.post = sinon.stub(),
-//     clientStub.patch = sinon.stub(),
-//     clientStub.delete = sinon.stub(),
-    
+//       clientStub.post = sinon.stub(),
+//       clientStub.patch = sinon.stub(),
+//       clientStub.delete = sinon.stub(),
+//       clientStub.post.resolves({ data: { access_token: 'anyToken' } })
+
 //     constructorStub = sinon.stub();
 //     constructorStub.default = sinon.stub();
 //     constructorStub.default.returns(clientStub);
+//     constructorStub.default.create = sinon.stub();
+//     constructorStub.default.create.returns(clientStub);
 //   });
 
 //   describe('constructor', () => {
@@ -36,12 +39,11 @@
 //       metadata.add('refreshToken', 'sampleToken');
 
 //       clientWrapperUnderTest = new ClientWrapper(metadata, constructorStub);
-//       expect(clientStub.post).to.have.been.calledWith('https://api.outreach.io/oauth/token', {
-//         client_id: 'sampleId',
-//         client_secret: 'sampleSecret',
-//         redirect_uri: 'sampleUrl',
-//         grant_type: 'refresh_token',
-//         refresh_token: 'sampleToken',
+//       expect(constructorStub.default.create).to.have.been.calledWith({
+//         baseURL: 'https://api.outreach.io/api/v2',
+//         headers: {
+//           Authorization: `Bearer ${'anyToken'}`,
+//         },
 //       });
 //     });
 //   });

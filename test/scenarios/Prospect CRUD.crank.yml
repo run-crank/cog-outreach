@@ -6,7 +6,7 @@ description: >
 tokens:
   test.firstName: Emails
   test.lastName: Test
-  test.email: test@test.com
+  test.email: testingCached@test.com
 
 steps:
 - step: Given I create an Outreach Prospect

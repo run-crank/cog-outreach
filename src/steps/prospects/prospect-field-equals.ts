@@ -108,7 +108,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
         // so that checks that are expected to fail will behave as expected
         actual = prospect.attributes[field] === null || prospect.attributes[field] === undefined ? 'null' : prospect.attributes[field];
       }
-      console.log(actual);
+
       const record = this.createRecord(prospect);
       const result = this.assert(operator, actual, expectation, field);
 

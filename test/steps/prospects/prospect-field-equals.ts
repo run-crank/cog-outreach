@@ -5,11 +5,11 @@ import * as sinonChai from 'sinon-chai';
 import 'mocha';
 
 import { Step as ProtoStep, StepDefinition, FieldDefinition, RunStepResponse, RecordDefinition, StepRecord } from '../../../src/proto/cog_pb';
-import { Step } from '../../../src/steps/accounts/account-field-equals';
+import { Step } from '../../../src/steps/prospects/prospect-field-equals';
 
 chai.use(sinonChai);
 
-describe('AccountFieldEqualsStep', () => {
+describe('ProspectFieldEqualsStep', () => {
   const expect = chai.expect;
   let protoStep: ProtoStep;
   let stepUnderTest: Step;
@@ -18,17 +18,16 @@ describe('AccountFieldEqualsStep', () => {
   beforeEach(() => {
     // An example of how you can stub/mock API client methods.
     apiClientStub = sinon.stub();
-    apiClientStub.getAccountById = sinon.stub();
-    apiClientStub.getAccountsByIdentifier = sinon.stub();
+    apiClientStub.getProspectByEmail = sinon.stub();
     stepUnderTest = new Step(apiClientStub);
     protoStep = new ProtoStep();
   });
 
   it('should return expected step metadata', () => {
     const stepDef: StepDefinition = stepUnderTest.getDefinition();
-    expect(stepDef.getStepId()).to.equal('AccountFieldEqualsStep');
-    expect(stepDef.getName()).to.equal('Check a field on an Outreach account');
-    expect(stepDef.getExpression()).to.equal('the (?<field>[a-zA-Z0-9_-]+) field on outreach account with (?<idField>[a-zA-Z0-9_-]+) (?<identifier>.+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?');
+    expect(stepDef.getStepId()).to.equal('ProspectFieldEqualsStep');
+    expect(stepDef.getName()).to.equal('Check a field on an Outreach prospect');
+    expect(stepDef.getExpression()).to.equal('the (?<field>[a-zA-Z0-9_-]+) field on outreach prospect (?<email>.+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?');
     expect(stepDef.getType()).to.equal(StepDefinition.Type.VALIDATION);
   });
 
@@ -38,15 +37,10 @@ describe('AccountFieldEqualsStep', () => {
       return field.toObject();
     });
 
-    // idField field
-    const idField: any = fields.filter(f => f.key === 'idField')[0];
-    expect(idField.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
-    expect(idField.type).to.equal(FieldDefinition.Type.STRING);
-
-    // idField field
-    const identifier: any = fields.filter(f => f.key === 'identifier')[0];
-    expect(identifier.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
-    expect(identifier.type).to.equal(FieldDefinition.Type.ANYSCALAR);
+    // email field
+    const email: any = fields.filter(f => f.key === 'email')[0];
+    expect(email.optionality).to.equal(FieldDefinition.Optionality.REQUIRED);
+    expect(email.type).to.equal(FieldDefinition.Type.EMAIL);
 
     // Field field
     const field: any = fields.filter(f => f.key === 'field')[0];
@@ -66,15 +60,14 @@ describe('AccountFieldEqualsStep', () => {
 
   it('should respond with pass if API client resolves expected data', async () => {
     // Stub a response that matches expectations.
-    const expectedAccount: any = { id: 'someId', attributes: { someField: 'Expected Value' }, relationships: { someRelationshipField: { data: 'someData' } } };
-    apiClientStub.getAccountsByIdentifier.resolves([expectedAccount])
+    const expectedProspect: any = { id: 'someId', attributes: { someField: 'Expected Value' }, relationships: { someRelationshipField: { data: 'someData' } } };
+    apiClientStub.getProspectByEmail.resolves(expectedProspect)
 
     // Set step data corresponding to expectations
     protoStep.setData(Struct.fromJavaScript({
-      idField: 'someIdField',
-      identifier: 'someId',
+      email: 'anyEmail',
       field: 'someField',
-      expectation: expectedAccount.attributes.someField,
+      expectation: expectedProspect.attributes.someField,
       operator: 'be',
     }));
 
@@ -85,13 +78,12 @@ describe('AccountFieldEqualsStep', () => {
 
   it('should respond with fail if API client resolves unexpected data', async () => {
     // Stub a response that does not match expectations.
-    const expectedAccount: any = { id: 'someId', attributes: { someField: 'Expected Value' }, relationships: { someRelationshipField: { data: 'someData' } } };
-    apiClientStub.getAccountsByIdentifier.resolves([expectedAccount])
+    const expectedProspect: any = { id: 'someId', attributes: { someField: 'Expected Value' }, relationships: { someRelationshipField: { data: 'someData' } } };
+    apiClientStub.getProspectByEmail.resolves(expectedProspect)
 
     // Set step data corresponding to expectations
     protoStep.setData(Struct.fromJavaScript({
-      idField: 'someIdField',
-      identifier: 'someId',
+      email: 'anyEmail',
       field: 'someField',
       expectation: 'Not expected',
       operator: 'be',
@@ -101,30 +93,14 @@ describe('AccountFieldEqualsStep', () => {
     expect(response.getOutcome()).to.equal(RunStepResponse.Outcome.FAILED);
   });
 
-  it('should respond with error if API client resolves no results', async () => {
-    // Stub a response with no results in the body.
-    apiClientStub.getAccountsByIdentifier.resolves([])
-    protoStep.setData(Struct.fromJavaScript({
-      idField: 'someIdField',
-      identifier: 'someId',
-      field: 'someField',
-      expectation: 'someValue',
-      operator: 'be',
-    }));
-
-    const response: RunStepResponse = await stepUnderTest.executeStep(protoStep);
-    expect(response.getOutcome()).to.equal(RunStepResponse.Outcome.FAILED);
-  });
-
-  it('should respond with error if resolved account does not contain given field', async () => {
+  it('should respond with error if resolved prospect does not contain given field', async () => {
     // Stub a response with valid response, but no expected field.
-    const expectedAccount: any = { id: 'someId', attributes: { someField: 'Expected Value' }, relationships: { someRelationshipField: { data: 'someData' } } };
-    apiClientStub.getAccountsByIdentifier.resolves([expectedAccount])
+    const expectedProspect: any = { id: 'someId', attributes: { someField: 'Expected Value' }, relationships: { someRelationshipField: { data: 'someData' } } };
+    apiClientStub.getProspectByEmail.resolves(expectedProspect)
     protoStep.setData(Struct.fromJavaScript({
-      idField: 'someIdField',
-      identifier: 'someId',
+      email: 'anyEmail',
       field: 'anotherField',
-      expectation: expectedAccount.attributes.someField,
+      expectation: expectedProspect.attributes.someField,
       operator: 'be',
     }));
 
@@ -135,7 +111,7 @@ describe('AccountFieldEqualsStep', () => {
 
   it('should respond with error if API client throws error', async () => {
     // Stub a response that throws any exception.
-    apiClientStub.getAccountsByIdentifier.throws();
+    apiClientStub.getProspectByEmail.throws();
     protoStep.setData(Struct.fromJavaScript({
       operator: 'be',
     }));
@@ -146,10 +122,9 @@ describe('AccountFieldEqualsStep', () => {
 
   it('should respond with error if expectedValue was not provided and operator is not either "be set" or "not be set"', async () => {
     const expectedProspect: any = { id: 'someId', attributes: { someField: 'Expected Value' }, relationships: { someRelationshipField: { data: 'someData' } } };
-    apiClientStub.getAccountsByIdentifier.resolves([expectedProspect]);
+    apiClientStub.getProspectByEmail.resolves(expectedProspect)
     protoStep.setData(Struct.fromJavaScript({
-      idField: 'someIdField',
-      identifier: 'someId',
+      email: 'anyEmail',
       field: 'someField',
       operator: 'be',
     }));
