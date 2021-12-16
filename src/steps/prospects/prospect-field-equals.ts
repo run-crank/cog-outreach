@@ -88,11 +88,13 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
 
       // Handle email field check to so be operator can work instead of just include
       // It will automatically pass once a prospect is found
-      if (this.listFields.includes(field) && operator.toLowerCase() === 'be') {
+      if (this.listFields.includes(field)) {
         const record = this.createRecord(prospect);
-        if (prospect.attributes[field].includes(expectation)) {
-          const result = this.assert(operator, expectation, expectation, field);
-          return this.pass(result.message, [], [record]);
+        if (operator.toLowerCase() === 'be') {
+          if (prospect.attributes[field].includes(expectation)) {
+            const result = this.assert(operator, expectation, expectation, field);
+            return this.pass(result.message, [], [record]);
+          }
         }
       }
 
