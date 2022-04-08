@@ -1,5 +1,5 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
-import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
+import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition, StepRecord } from '../../proto/cog_pb';
 import * as moment from 'moment';
 import { titleCase } from 'title-case';
 
@@ -75,8 +75,9 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
 
       account = this.validateObject(account);
       const result = await this.client.updateAccount(accounts[0].id, account, this.relationship);
-      const record = this.keyValue('account', 'Updated Account', { id: result.id });
-      return this.pass('Successfully updated Account with %s %s', [idField, identifier], [record]);
+      const record = this.createRecord(result);
+      const orderedRecord = this.createOrderedRecord(result, stepData['__stepOrder']);
+      return this.pass('Successfully updated Account with %s %s', [idField, identifier], [record, orderedRecord]);
     } catch (e) {
       return this.error('There was a problem updating the Account: %s', [e.toString()]);
     }
@@ -125,6 +126,14 @@ export class AccountUpdateStep extends BaseStep implements StepInterface {
     headers['id'] = 'Id';
     Object.keys(accounts[0].attributes).forEach(key => headers[key] = titleCase(key));
     return this.table('matchedAccounts', 'Matched Accounts', headers, records);
+  }
+
+  public createRecord(account): StepRecord {
+    return this.keyValue('account', 'Updated Account', { id: account.id });
+  }
+
+  public createOrderedRecord(account, stepOrder = 1): StepRecord {
+    return this.keyValue(`account.${stepOrder}`, `Updated Account from Step ${stepOrder}`, { id: account.id });
   }
 }
 
