@@ -1,5 +1,5 @@
 import { BaseStep, Field, StepInterface, ExpectedRecord } from '../../core/base-step';
-import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition } from '../../proto/cog_pb';
+import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinition, StepRecord } from '../../proto/cog_pb';
 import * as moment from 'moment';
 
 export class ProspectUpdateStep extends BaseStep implements StepInterface {
@@ -73,8 +73,9 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
 
       prospect = this.validateObject(prospect);
       const result = await this.client.updateProspect(existingProspect.id, prospect, this.relationship);
-      const record = this.keyValue('prospect', 'Updated Prospect', { id: result.id });
-      return this.pass('Successfully updated Prospect with ID %s', [result.id], [record]);
+      const record = this.createRecord(result);
+      const orderedRecord = this.createOrderedRecord(result, stepData['__stepOrder']);
+      return this.pass('Successfully updated Prospect with ID %s', [result.id], [record, orderedRecord]);
     } catch (e) {
       return this.error('There was a problem updating the Prospect: %s', [e.toString()]);
     }
@@ -112,6 +113,13 @@ export class ProspectUpdateStep extends BaseStep implements StepInterface {
     };
   }
 
+  public createRecord(prospect): StepRecord {
+    return this.keyValue('prospect', 'Updated Prospect', { id: prospect.id });
+  }
+
+  public createOrderedRecord(prospect, stepOrder = 1): StepRecord {
+    return this.keyValue(`prospect.${stepOrder}`, `Updated Prospect from Step ${stepOrder}`, { id: prospect.id });
+  }
 }
 
 export { ProspectUpdateStep as Step };
