@@ -103,11 +103,15 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
   }
 
   public createRecord(prospect): StepRecord {
-    return this.keyValue('prospect', 'Created Prospect', { id: prospect.id });
+    const obj = {};
+    Object.keys(prospect.attributes).forEach(key => obj[key] = prospect.attributes[key]);
+    return this.keyValue('prospect', 'Created Prospect', obj);
   }
 
   public createOrderedRecord(prospect, stepOrder = 1): StepRecord {
-    return this.keyValue(`prospect.${stepOrder}`, `Created Prospect from Step ${stepOrder}`, { id: prospect.id });
+    const obj = {};
+    Object.keys(prospect.attributes).forEach(key => obj[key] = prospect.attributes[key]);
+    return this.keyValue(`prospect.${stepOrder}`, `Created Prospect from Step ${stepOrder}`, obj);
   }
 
 }
