@@ -53,6 +53,9 @@ describe('AccountCreateStep', () => {
     };
     const expectedResponse = {
       id: 'sampleId',
+      attributes: {
+        anyKey: 'anyValue',
+      }
     };
     // Set step data corresponding to expectations
     clientWrapperStub.createAccount.resolves(expectedResponse);
