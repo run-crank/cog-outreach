@@ -89,11 +89,11 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
       // Handle email field check to so be operator can work instead of just include
       // It will automatically pass once a prospect is found
       if (this.listFields.includes(field)) {
-        const record = this.createRecord(prospect);
+        const records = this.createRecords(prospect, stepData['__stepOrder']);
         if (operator.toLowerCase() === 'be') {
           if (prospect.attributes[field].includes(expectation)) {
             const result = this.assert(operator, expectation, expectation, field);
-            return this.pass(result.message, [], [record]);
+            return this.pass(result.message, [], records);
           }
         }
       }
@@ -103,19 +103,19 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
         actual = prospect.relationships[field].data.id.toString();
       } else {
         if (!prospect.attributes.hasOwnProperty(field)) {
-          const record = this.createRecord(prospect);
-          return this.fail('The %s field does not exist on Prospect %s', [field, email], [record]);
+          const records = this.createRecords(prospect, stepData['__stepOrder']);
+          return this.fail('The %s field does not exist on Prospect %s', [field, email], records);
         }
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
         actual = prospect.attributes[field] === null || prospect.attributes[field] === undefined ? 'null' : prospect.attributes[field];
       }
 
-      const record = this.createRecord(prospect);
+      const records = this.createRecords(prospect, stepData['__stepOrder']);
       const result = this.assert(operator, actual, expectation, field);
 
-      return result.valid ? this.pass(result.message, [], [record])
-        : this.fail(result.message, [], [record]);
+      return result.valid ? this.pass(result.message, [], records)
+        : this.fail(result.message, [], records);
 
     } catch (e) {
       if (e instanceof util.UnknownOperatorError) {
@@ -129,7 +129,7 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
     }
   }
 
-  public createRecord(prospect): StepRecord {
+  public createRecords(prospect, stepOrder = 1): StepRecord[] {
     const obj = {};
 
     // Set attributes on structured data
@@ -142,8 +142,13 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
         obj[key] = prospect.relationships[key].data.id || null;
       }
     });
-    const record = this.keyValue('prospect', 'Checked Prospect', obj);
-    return record;
+
+    const records = [];
+    // Base Record
+    records.push(this.keyValue('prospect', 'Checked Prospect', obj));
+    // Ordered Record
+    records.push(this.keyValue(`prospect.${stepOrder}`, `Checked Prospect from Step ${stepOrder}`, obj));
+    return records;
   }
 }
 
