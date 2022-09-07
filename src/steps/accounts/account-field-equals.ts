@@ -96,16 +96,16 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
         return this.fail('No Account was found with %s %s', [idField, identifier]);
       } else if (accounts.length > 1) {
         // If the client returns more than one account, return an error.
-        return this.fail('More than one account matches %s %s', [idField, identifier], [this.createRecords(accounts)]);
+        return this.fail('More than one account matches %s %s', [idField, identifier], [this.createTableRecords(accounts)]);
       }
 
       // Handle email field check to so be operator can work instead of just include
       // It will automatically pass once a prospect is found
       if (this.listFields.includes(field) && operator.toLowerCase() === 'be') {
-        const record = this.createRecord(accounts[0]);
+        const records = this.createRecords(accounts[0], stepData['__stepOrder']);
         if (accounts[0].attributes[field].includes(expectation)) {
           const result = this.assert(operator, expectation, expectation, field);
-          return this.pass(result.message, [], [record]);
+          return this.pass(result.message, [], records);
         }
       }
 
@@ -114,19 +114,19 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
         actual = accounts[0].relationships[field].data.id.toString();
       } else {
         if (!accounts[0].attributes.hasOwnProperty(field)) {
-          const record = this.createRecord(accounts[0]);
-          return this.fail('The %s field does not exist on Prospect with %s %s', [field, idField, identifier], [record]);
+          const records = this.createRecords(accounts[0], stepData['__stepOrder']);
+          return this.fail('The %s field does not exist on Prospect with %s %s', [field, idField, identifier], records);
         }
         // Since empty fields are not being returned by the API, default to undefined
         // so that checks that are expected to fail will behave as expected
         actual = accounts[0].attributes[field] === null || accounts[0].attributes[field] === undefined ? 'null' : accounts[0].attributes[field];
       }
 
-      const record = this.createRecord(accounts[0]);
+      const records = this.createRecords(accounts[0], stepData['__stepOrder']);
       const result = this.assert(operator, actual, expectation, field);
 
-      return result.valid ? this.pass(result.message, [], [record])
-        : this.fail(result.message, [], [record]);
+      return result.valid ? this.pass(result.message, [], records)
+        : this.fail(result.message, [], records);
 
     } catch (e) {
       if (e instanceof util.UnknownOperatorError) {
@@ -140,7 +140,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
     }
   }
 
-  createRecord(account): StepRecord {
+  public createRecords(account, stepOrder = 1): StepRecord[] {
     const obj = {};
 
     // Set attributes on structured data
@@ -153,11 +153,16 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
         obj[key] = account.relationships[key].data.id || null;
       }
     });
-    const record = this.keyValue('account', 'Checked Account', obj);
-    return record;
+
+    const records = [];
+    // Base Record
+    records.push(this.keyValue('account', 'Checked Account', obj));
+    // Ordered Record
+    records.push(this.keyValue(`account.${stepOrder}`, `Checked Account from Step ${stepOrder}`, obj));
+    return records;
   }
 
-  createRecords(accounts: Record<string, any>[]) {
+  createTableRecords(accounts: Record<string, any>[]) {
     const records = [];
     accounts.forEach((account) => {
       delete account.relationships;
