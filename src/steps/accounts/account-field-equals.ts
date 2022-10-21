@@ -104,7 +104,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
       if (this.listFields.includes(field) && operator.toLowerCase() === 'be') {
         const records = this.createRecords(accounts[0], stepData['__stepOrder']);
         if (accounts[0].attributes[field].includes(expectation)) {
-          const result = this.assert(operator, expectation, expectation, field);
+          const result = this.assert(operator, expectation, expectation, field, stepData['__piiSuppressionLevel']);
           return this.pass(result.message, [], records);
         }
       }
@@ -123,7 +123,7 @@ export class AccountFieldEqualsStep extends BaseStep implements StepInterface {
       }
 
       const records = this.createRecords(accounts[0], stepData['__stepOrder']);
-      const result = this.assert(operator, actual, expectation, field);
+      const result = this.assert(operator, actual, expectation, field, stepData['__piiSuppressionLevel']);
 
       return result.valid ? this.pass(result.message, [], records)
         : this.fail(result.message, [], records);
