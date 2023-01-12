@@ -5,9 +5,11 @@ import { titleCase } from 'title-case';
 
 export class AccountUpdateStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Update an Outreach Account';
+  protected stepName: string = 'Update an Outreach account';
   protected stepExpression: string = 'update an outreach account';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
+  protected actionList: string[] = ['update'];
+  protected targetObject: string = 'Account';
   protected expectedFields: Field[] = [{
     field: 'idField',
     type: FieldDefinition.Type.STRING,

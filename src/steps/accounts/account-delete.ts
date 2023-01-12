@@ -4,9 +4,11 @@ import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinitio
 
 export class AccountDeleteStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Delete an Outreach Account';
+  protected stepName: string = 'Delete an Outreach account';
   protected stepExpression: string = 'delete the outreach account with (?<idField>[a-zA-Z0-9_]+) (?<identifier>.+)';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
+  protected actionList: string[] = ['delete'];
+  protected targetObject: string = 'Account';
   protected expectedFields: Field[] = [{
     field: 'idField',
     type: FieldDefinition.Type.STRING,

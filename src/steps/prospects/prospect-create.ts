@@ -4,9 +4,11 @@ import * as moment from 'moment';
 
 export class ProspectCreateStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Create an Outreach Prospect';
+  protected stepName: string = 'Create an Outreach prospect';
   protected stepExpression: string = 'create an outreach prospect';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
+  protected actionList: string[] = ['create'];
+  protected targetObject: string = 'Prospect';
   protected expectedFields: Field[] = [{
     field: 'prospect',
     type: FieldDefinition.Type.MAP,
