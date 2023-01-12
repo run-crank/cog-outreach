@@ -11,6 +11,8 @@ export class ProspectFieldEqualsStep extends BaseStep implements StepInterface {
   // tslint:disable-next-line:max-line-length
   protected stepExpression: string = 'the (?<field>[a-zA-Z0-9_-]+) field on outreach prospect (?<email>.+) should (?<operator>be set|not be set|be less than|be greater than|be one of|be|contain|not be one of|not be|not contain|match|not match) ?(?<expectation>.+)?';
   protected stepType: StepDefinition.Type = StepDefinition.Type.VALIDATION;
+  protected actionList: string[] = ['check'];
+  protected targetObject: string = 'Prospect';
   protected expectedFields: Field[] = [{
     field: 'email',
     type: FieldDefinition.Type.EMAIL,

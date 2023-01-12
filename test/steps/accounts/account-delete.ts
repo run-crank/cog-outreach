@@ -27,7 +27,7 @@ describe('DeleteAccountStep', () => {
   it('should return expected step metadata', () => {
     const stepDef: StepDefinition = stepUnderTest.getDefinition();
     expect(stepDef.getStepId()).to.equal('AccountDeleteStep');
-    expect(stepDef.getName()).to.equal('Delete an Outreach Account');
+    expect(stepDef.getName()).to.equal('Delete an Outreach account');
     expect(stepDef.getExpression()).to.equal('delete the outreach account with (?<idField>[a-zA-Z0-9_]+) (?<identifier>.+)');
     expect(stepDef.getType()).to.equal(StepDefinition.Type.ACTION);
   });

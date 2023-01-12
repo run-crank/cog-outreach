@@ -4,9 +4,11 @@ import * as moment from 'moment';
 
 export class ProspectUpdateStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Update an Outreach Prospect';
+  protected stepName: string = 'Update an Outreach prospect';
   protected stepExpression: string = 'update an outreach prospect';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
+  protected actionList: string[] = ['update'];
+  protected targetObject: string = 'Prospect';
   protected expectedFields: Field[] = [{
     field: 'email',
     type: FieldDefinition.Type.EMAIL,

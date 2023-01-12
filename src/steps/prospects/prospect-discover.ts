@@ -9,6 +9,8 @@ export class DiscoverProspect extends BaseStep implements StepInterface {
   // tslint:disable-next-line:max-line-length
   protected stepExpression: string = 'discover fields on outreach prospect (?<email>.+)';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
+  protected actionList: string[] = ['discover'];
+  protected targetObject: string = 'Prospect';
   protected expectedFields: Field[] = [{
     field: 'email',
     type: FieldDefinition.Type.EMAIL,

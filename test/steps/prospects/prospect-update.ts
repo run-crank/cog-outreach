@@ -27,7 +27,7 @@ describe('ProspectUpdateStep', () => {
   it('should return expected step metadata', () => {
     const stepDef: StepDefinition = stepUnderTest.getDefinition();
     expect(stepDef.getStepId()).to.equal('ProspectUpdateStep');
-    expect(stepDef.getName()).to.equal('Update an Outreach Prospect');
+    expect(stepDef.getName()).to.equal('Update an Outreach prospect');
     expect(stepDef.getExpression()).to.equal('update an outreach prospect');
     expect(stepDef.getType()).to.equal(StepDefinition.Type.ACTION);
   });

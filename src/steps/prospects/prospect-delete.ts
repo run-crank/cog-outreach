@@ -3,9 +3,11 @@ import { Step, RunStepResponse, FieldDefinition, StepDefinition, RecordDefinitio
 
 export class ProspectDeleteStep extends BaseStep implements StepInterface {
 
-  protected stepName: string = 'Delete an Outreach Prospect';
+  protected stepName: string = 'Delete an Outreach prospect';
   protected stepExpression: string = 'delete the outreach prospect with email (?<email>.+)';
   protected stepType: StepDefinition.Type = StepDefinition.Type.ACTION;
+  protected actionList: string[] = ['delete'];
+  protected targetObject: string = 'Prospect';
   protected expectedFields: Field[] = [{
     field: 'email',
     type: FieldDefinition.Type.EMAIL,
