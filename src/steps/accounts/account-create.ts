@@ -95,7 +95,7 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
     Object.keys(account.attributes).forEach(key => obj[key] = account.attributes[key]);
     return this.keyValue('account', 'Created Account', obj);
   }
-  
+
   public createPassingRecord(data, fields): StepRecord {
     const obj = {};
     Object.keys(data.attributes).forEach(key => obj[key] = data.attributes[key]);
