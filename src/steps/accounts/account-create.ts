@@ -50,8 +50,9 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
       account = this.validateObject(account);
       const result = await this.client.createAccount(account, this.relationship);
       const record = this.createRecord(result);
+      const passingRecord = this.createPassingRecord(result, Object.keys(account));
       const orderedRecord = this.createOrderedRecord(result, stepData['__stepOrder']);
-      return this.pass('Successfully created Account with ID %s', [result.id], [record, orderedRecord]);
+      return this.pass('Successfully created Account with ID %s', [result.id], [record, passingRecord, orderedRecord]);
     } catch (e) {
       return this.error('There was a problem creating the Account: %s', [e.toString()]);
     }
@@ -93,6 +94,21 @@ export class AccountCreateStep extends BaseStep implements StepInterface {
     const obj = {};
     Object.keys(account.attributes).forEach(key => obj[key] = account.attributes[key]);
     return this.keyValue('account', 'Created Account', obj);
+  }
+
+  public createPassingRecord(data, fields): StepRecord {
+    const obj = {};
+    Object.keys(data.attributes).forEach(key => obj[key] = data.attributes[key]);
+
+    const filteredData = {};
+    if (obj) {
+      Object.keys(obj).forEach((key) => {
+        if (fields.includes(key)) {
+          filteredData[key] = obj[key];
+        }
+      });
+    }
+    return this.keyValue('exposeOnPass:account', 'Created Account', filteredData);
   }
 
   public createOrderedRecord(account, stepOrder = 1): StepRecord {

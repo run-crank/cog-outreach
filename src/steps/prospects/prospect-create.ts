@@ -65,8 +65,9 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
       prospect = this.validateObject(prospect);
       const result = await this.client.createProspect(prospect, this.relationship);
       const record = this.createRecord(result);
+      const passingRecord = this.createPassingRecord(result, Object.keys(prospect));
       const orderedRecord = this.createOrderedRecord(result, stepData['__stepOrder']);
-      return this.pass('Successfully created Prospect with ID %s', [result.id], [record, orderedRecord]);
+      return this.pass('Successfully created Prospect with ID %s', [result.id], [record, passingRecord, orderedRecord]);
     } catch (e) {
       return this.error('There was a problem creating the Prospect: %s', [e.toString()]);
     }
@@ -108,6 +109,21 @@ export class ProspectCreateStep extends BaseStep implements StepInterface {
     const obj = {};
     Object.keys(prospect.attributes).forEach(key => obj[key] = prospect.attributes[key]);
     return this.keyValue('prospect', 'Created Prospect', obj);
+  }
+
+  public createPassingRecord(data, fields): StepRecord {
+    const obj = {};
+    Object.keys(data.attributes).forEach(key => obj[key] = data.attributes[key]);
+
+    const filteredData = {};
+    if (obj) {
+      Object.keys(obj).forEach((key) => {
+        if (fields.includes(key)) {
+          filteredData[key] = obj[key];
+        }
+      });
+    }
+    return this.keyValue('exposeOnPass:prospect', 'Created Prospect', filteredData);
   }
 
   public createOrderedRecord(prospect, stepOrder = 1): StepRecord {
